@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "310643775278",
+    "project_id": "liveness-4a664",
+    "storage_bucket": "liveness-4a664.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:310643775278:android:1b0e2a5da8344f8ff60cbf",
+        "android_client_info": {
+          "package_name": "com.example.liveness"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAeRhF5j-1nmkF21pcJSPiZiLcqY35yHeg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
