@@ -2,7 +2,8 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart' as mlkit;
+import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart'
+    as mlkit;
 import 'package:image/image.dart' as img;
 import 'package:liveness/helper/image_helper.dart';
 
@@ -44,14 +45,19 @@ class FaceImage {
     CameraImage frame,
     CameraDescription cameraDescription,
   ) async {
-    img.Image? baseImage = await ImageHelper.convertImage(frame); // Black and white conversion
+    img.Image? baseImage =
+        await ImageHelper.convertImage(frame); // Black and white conversion
     if (baseImage == null) {
       return null;
     }
     // Convert CameraImage to Image and rotate it so that our frame will be in a portrait
     img.Image image = img.copyRotate(
       baseImage,
-      Platform.isAndroid ? (cameraDescription.lensDirection == CameraLensDirection.front ? 270 : 90) : 0,
+      Platform.isAndroid
+          ? (cameraDescription.lensDirection == CameraLensDirection.front
+              ? 270
+              : 90)
+          : 0,
     );
 
     Rect faceRect = face.boundingBox;

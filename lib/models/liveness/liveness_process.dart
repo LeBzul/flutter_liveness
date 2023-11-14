@@ -1,11 +1,10 @@
-import 'package:json_annotation/json_annotation.dart';
+
 import 'package:liveness/helper/list_helper.dart';
 import 'package:liveness/models/face.dart';
 import 'package:liveness/models/liveness/condition/liveness_condition_result.dart';
 
 import 'condition/liveness_condition.dart';
 
-@JsonSerializable()
 class LivenessProcess {
   int? faceId;
 

@@ -23,7 +23,7 @@ class FaceRecognizer {
 
   TensorBuffer? _outputBuffer;
 
-  TfLiteType _inputType = TfLiteType.float32;
+  TensorType _inputType = TensorType.float32;
   SequentialProcessor<TensorBuffer>? _probabilityProcessor;
 
   FaceRecognizer({
@@ -41,7 +41,8 @@ class FaceRecognizer {
 
   Future<void> loadModel() async {
     try {
-      final ByteData data = await rootBundle.load('packages/liveness/assets/${modelName.value}');
+      final ByteData data =
+          await rootBundle.load('packages/liveness/assets/${modelName.value}');
       final Uint8List bytes = data.buffer.asUint8List();
 
       Interpreter interpreter = Interpreter.fromBuffer(
@@ -54,7 +55,7 @@ class FaceRecognizer {
       _outputShape = interpreter.getOutputTensor(0).shape;
 
       _inputType = interpreter.getInputTensor(0).type;
-      TfLiteType outputType = interpreter.getOutputTensor(0).type;
+      TensorType outputType = interpreter.getOutputTensor(0).type;
 
       _outputBuffer = TensorBuffer.createFixedSize(_outputShape, outputType);
       _probabilityProcessor = TensorProcessorBuilder()
@@ -69,7 +70,8 @@ class FaceRecognizer {
 
   FaceRecognition? recognize(FaceImage faceImage) {
     TensorBuffer? outputBuffer = _outputBuffer;
-    SequentialProcessor<TensorBuffer>? probabilityProcessor = _probabilityProcessor;
+    SequentialProcessor<TensorBuffer>? probabilityProcessor =
+        _probabilityProcessor;
     if (outputBuffer == null || probabilityProcessor == null) {
       return null;
     }

@@ -13,11 +13,15 @@ class ImageUtils {
     final int uvRowStride = cameraImage.planes[1].bytesPerRow;
     final int uvPixelStride = cameraImage.planes[1].bytesPerPixel!;
 
-    final image = img.Image(width, height);
+    final image = img.Image(
+      width,
+      height,
+    );
 
     for (int w = 0; w < width; w++) {
       for (int h = 0; h < height; h++) {
-        final int uvIndex = uvPixelStride * (w / 2).floor() + uvRowStride * (h / 2).floor();
+        final int uvIndex =
+            uvPixelStride * (w / 2).floor() + uvRowStride * (h / 2).floor();
         final int index = h * width + w;
 
         final y = cameraImage.planes[0].bytes[index];
@@ -42,7 +46,10 @@ class ImageUtils {
     g = g.clamp(0, 255);
     b = b.clamp(0, 255);
 
-    return 0xff000000 | ((b << 16) & 0xff0000) | ((g << 8) & 0xff00) | (r & 0xff);
+    return 0xff000000 |
+        ((b << 16) & 0xff0000) |
+        ((g << 8) & 0xff00) |
+        (r & 0xff);
   }
 }
 
@@ -89,19 +96,23 @@ class ImageHelper {
   }
 
   static img.Image _convertYUV420(CameraImage image) {
-    var imageResult = img.Image(image.width, image.height); // Create Image buffer
+    var imageResult =
+        img.Image(image.width, image.height); // Create Image buffer
 
     Plane plane = image.planes[0];
     const int shift = (0xFF << 24);
 
     // Fill image buffer with plane[0] from YUV420_888
     for (int x = 0; x < image.width; x++) {
-      for (int planeOffset = 0; planeOffset < image.height * image.width; planeOffset += image.width) {
+      for (int planeOffset = 0;
+          planeOffset < image.height * image.width;
+          planeOffset += image.width) {
         final pixelColor = plane.bytes[planeOffset + x];
         // color: 0x FF  FF  FF  FF
         //           A   B   G   R
         // Calculate pixel color
-        var newVal = shift | (pixelColor << 16) | (pixelColor << 8) | pixelColor;
+        var newVal =
+            shift | (pixelColor << 16) | (pixelColor << 8) | pixelColor;
 
         imageResult.data[planeOffset + x] = newVal;
       }

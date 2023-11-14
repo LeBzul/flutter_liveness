@@ -31,8 +31,8 @@ dependencies:
   flutter:
     sdk: flutter
   liveness:
-    path: ../../liveness
-
+    path: ../../flutter_liveness
+  animated_toggle_switch: ^0.8.0
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
@@ -48,6 +48,8 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
 
+dependency_overrides:
+  image: ^3.3.0
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

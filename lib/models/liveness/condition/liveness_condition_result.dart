@@ -1,7 +1,5 @@
-import 'package:json_annotation/json_annotation.dart';
 import 'package:liveness/models/face.dart';
 
-@JsonSerializable()
 class LivenessConditionResult {
   String name;
   List<double> value;

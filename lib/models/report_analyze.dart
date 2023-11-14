@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:intl/intl.dart';
 import 'package:liveness/controllers/face_controller.dart';
 
 import 'face_recognizer/model/face_recognition.dart';
@@ -12,7 +11,6 @@ class ReportAnalyze {
     required FaceRecognition? cniRecognition,
   }) {
     Map<String, dynamic> reportMap = <String, dynamic>{};
-    DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
 
     reportMap.putIfAbsent(
       'model',
