@@ -53,7 +53,7 @@ class FaceImage {
     // Convert CameraImage to Image and rotate it so that our frame will be in a portrait
     img.Image image = img.copyRotate(
       baseImage,
-      Platform.isAndroid
+      angle: Platform.isAndroid
           ? (cameraDescription.lensDirection == CameraLensDirection.front
               ? 270
               : 90)
@@ -64,10 +64,10 @@ class FaceImage {
     // Crop image to only have the head/face
     img.Image copyCrop = img.copyCrop(
       image,
-      faceRect.left.toInt(),
-      faceRect.top.toInt(),
-      faceRect.width.toInt(),
-      faceRect.height.toInt(),
+      x: faceRect.left.toInt(),
+      y: faceRect.top.toInt(),
+      width: faceRect.width.toInt(),
+      height: faceRect.height.toInt(),
     );
 
     return copyCrop;

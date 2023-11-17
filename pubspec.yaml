@@ -14,16 +14,16 @@ dependencies:
   cupertino_icons: ^1.0.2
   google_mlkit_face_detection: ^0.7.0
   camera: ^0.10.4
+  image: ^4.0.17
   tflite_flutter: ^0.10.0
   path_provider: ^2.0.9
   tflite_flutter_helper:
-    #path: /Users/gdrouin/Documents/development/tflite_flutter_helper
-    git:
-      url: https://github.com/LeBzul/tflite_flutter_helper.git
-      ref: master # branch name
+    path: /Users/gdrouin/Documents/development/tflite_flutter_helper
+    #git:
+    #  url: https://github.com/LeBzul/tflite_flutter_helper.git
+    #  ref: master # branch name
 
 dependency_overrides:
-  image: ^3.3.0
   google_mlkit_commons: ^0.5.0
 
 dev_dependencies:

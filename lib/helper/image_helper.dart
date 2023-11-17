@@ -4,55 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image/image.dart' as img;
 
-class ImageUtils {
-  /// Converts a [CameraImage] in YUV420 format to [imageLib.Image] in RGB format
-  static img.Image convertYUV420ToImage(CameraImage cameraImage) {
-    final int width = cameraImage.width;
-    final int height = cameraImage.height;
-
-    final int uvRowStride = cameraImage.planes[1].bytesPerRow;
-    final int uvPixelStride = cameraImage.planes[1].bytesPerPixel!;
-
-    final image = img.Image(
-      width,
-      height,
-    );
-
-    for (int w = 0; w < width; w++) {
-      for (int h = 0; h < height; h++) {
-        final int uvIndex =
-            uvPixelStride * (w / 2).floor() + uvRowStride * (h / 2).floor();
-        final int index = h * width + w;
-
-        final y = cameraImage.planes[0].bytes[index];
-        final u = cameraImage.planes[1].bytes[uvIndex];
-        final v = cameraImage.planes[2].bytes[uvIndex];
-
-        image.data[index] = ImageUtils.yuv2rgb(y, u, v);
-      }
-    }
-    return image;
-  }
-
-  /// Convert a single YUV pixel to RGB
-  static int yuv2rgb(int y, int u, int v) {
-    // Convert yuv pixel to rgb
-    int r = (y + v * 1436 / 1024 - 179).round();
-    int g = (y - u * 46549 / 131072 + 44 - v * 93604 / 131072 + 91).round();
-    int b = (y + u * 1814 / 1024 - 227).round();
-
-    // Clipping RGB values to be inside boundaries [ 0 , 255 ]
-    r = r.clamp(0, 255);
-    g = g.clamp(0, 255);
-    b = b.clamp(0, 255);
-
-    return 0xff000000 |
-        ((b << 16) & 0xff0000) |
-        ((g << 8) & 0xff00) |
-        (r & 0xff);
-  }
-}
-
 class ImageHelper {
   static Future<img.Image?> convertImage(CameraImage image) async {
     try {
@@ -78,47 +29,51 @@ class ImageHelper {
     var p = src.getBytes();
     for (var i = 0, len = p.length; i < len; i += 4) {
       var l = img.getLuminanceRgb(p[i], p[i + 1], p[i + 2]);
-      p[i] = l;
-      p[i + 1] = l;
-      p[i + 2] = l;
+      p[i] = l.toInt();
+      p[i + 1] = l.toInt();
+      p[i + 2] = l.toInt();
     }
     return src;
   }
 
 // CameraImage BGRA8888 -> PNG
   static img.Image _convertBGRA8888(CameraImage image) {
-    return _convertBGRA8888ToGray(img.Image.fromBytes(
-      image.width,
-      image.height,
-      image.planes[0].bytes,
-      format: img.Format.bgra,
-    ));
+    return img.Image.fromBytes(
+      width: image.width,
+      height: image.height,
+      bytes: image.planes[0].bytes.buffer,
+      order: img.ChannelOrder.bgra,
+    );
+    /*_convertBGRA8888ToGray(img.Image.fromBytes(
+      width: image.width,
+      height: image.height,
+      bytes: image.planes[0].bytes.buffer,
+      order: img.ChannelOrder.bgra,
+    ));*/
   }
 
   static img.Image _convertYUV420(CameraImage image) {
-    var imageResult =
-        img.Image(image.width, image.height); // Create Image buffer
-
-    Plane plane = image.planes[0];
-    const int shift = (0xFF << 24);
-
-    // Fill image buffer with plane[0] from YUV420_888
-    for (int x = 0; x < image.width; x++) {
-      for (int planeOffset = 0;
-          planeOffset < image.height * image.width;
-          planeOffset += image.width) {
-        final pixelColor = plane.bytes[planeOffset + x];
-        // color: 0x FF  FF  FF  FF
-        //           A   B   G   R
-        // Calculate pixel color
-        var newVal =
-            shift | (pixelColor << 16) | (pixelColor << 8) | pixelColor;
-
-        imageResult.data[planeOffset + x] = newVal;
-      }
+    final uvRowStride = image.planes[1].bytesPerRow;
+    final uvPixelStride = image.planes[1].bytesPerPixel ?? 0;
+    final convertImage = img.Image(width: image.width, height: image.height);
+    for (final p in convertImage) {
+      final x = p.x;
+      final y = p.y;
+      final uvIndex =
+          uvPixelStride * (x / 2).floor() + uvRowStride * (y / 2).floor();
+      final index = y * uvRowStride +
+          x; // Use the row stride instead of the image width as some devices pad the image data, and in those cases the image width != bytesPerRow. Using width will give you a distored image.
+      final yp = image.planes[0].bytes[index];
+      final up = image.planes[1].bytes[uvIndex];
+      final vp = image.planes[2].bytes[uvIndex];
+      p.r = (yp + vp * 1436 / 1024 - 179).round().clamp(0, 255).toInt();
+      p.g = (yp - up * 46549 / 131072 + 44 - vp * 93604 / 131072 + 91)
+          .round()
+          .clamp(0, 255)
+          .toInt();
+      p.b = (yp + up * 1814 / 1024 - 227).round().clamp(0, 255).toInt();
     }
-
-    return imageResult;
+    return convertImage;
   }
 
   /// Convert CameraImage from MlKit Image
