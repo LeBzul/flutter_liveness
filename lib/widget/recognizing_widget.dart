@@ -51,7 +51,6 @@ class _RecognizingWidgetState extends State<RecognizingWidget> {
         widget.successResult.call(recognition);
       },
       registeredFaces: registeredFaces,
-      removeBlurredResult: widget.removeBlurredResult,
     );
   }
 

@@ -9,15 +9,20 @@ import 'package:liveness/models/liveness/liveness_process.dart';
 class LivenessWidget extends StatefulWidget {
   final List<LivenessCondition> liveNessActiveConditions;
   final List<LivenessCondition> liveNessPassiveConditions;
-  final Function(LivenessProcess liveness, List<FaceRecognition> faceRecognitions) livenessSuccessResult;
-  final Function(LivenessCondition? actualLivenessCondition)? actualLivenessChange;
+  final Function(
+    LivenessProcess liveness,
+    List<FaceRecognition> faceRecognitions,
+    double distance,
+  ) livenessSuccessResult;
+  final Function(LivenessCondition? actualLivenessCondition)?
+      actualLivenessChange;
   final Function(
     LivenessProcess liveness,
     List<LivenessCondition> errorConditions,
   ) livenessErrorResult;
 
+  final String identityImageBase64;
   final Widget? instructionsOverlay;
-  final bool removeBlurredResult;
 
   const LivenessWidget({
     Key? key,
@@ -25,9 +30,9 @@ class LivenessWidget extends StatefulWidget {
     required this.liveNessPassiveConditions,
     required this.livenessSuccessResult,
     required this.livenessErrorResult,
+    required this.identityImageBase64,
     this.actualLivenessChange,
     this.instructionsOverlay,
-    this.removeBlurredResult = true,
   }) : super(key: key);
 
   @override
@@ -51,8 +56,12 @@ class _LivenessWidgetState extends State<LivenessWidget> {
       },
       liveNessStepConditions: widget.liveNessActiveConditions,
       liveNessPassiveStepConditions: widget.liveNessPassiveConditions,
-      livenessSuccessResult: (liveness, faceRecognitions) {
-        widget.livenessSuccessResult.call(liveness, faceRecognitions);
+      livenessSuccessResult: (liveness, faceRecognitions, distance) {
+        widget.livenessSuccessResult.call(
+          liveness,
+          faceRecognitions,
+          distance,
+        );
         setState(() {});
       },
       livenessErrorResult: (errorConditions) {
@@ -63,7 +72,7 @@ class _LivenessWidgetState extends State<LivenessWidget> {
         setState(() {});
       },
       actualLivenessChange: widget.actualLivenessChange,
-      removeBlurredResult: widget.removeBlurredResult,
+      identityImageBase64: widget.identityImageBase64,
     );
   }
 

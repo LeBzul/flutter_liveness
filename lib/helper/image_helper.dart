@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -44,12 +46,6 @@ class ImageHelper {
       bytes: image.planes[0].bytes.buffer,
       order: img.ChannelOrder.bgra,
     );
-    /*_convertBGRA8888ToGray(img.Image.fromBytes(
-      width: image.width,
-      height: image.height,
-      bytes: image.planes[0].bytes.buffer,
-      order: img.ChannelOrder.bgra,
-    ));*/
   }
 
   static img.Image _convertYUV420(CameraImage image) {
@@ -76,8 +72,39 @@ class ImageHelper {
     return convertImage;
   }
 
+  static img.Image? base64ToImage(String base64) {
+    return img.decodeImage(Uint8List.fromList(base64Decode(base64)));
+  }
+
   /// Convert CameraImage from MlKit Image
-  static InputImage? getInputImage(
+  static InputImage? getInputImageFromBase64(
+    String base64,
+  ) {
+    final baseImage = base64ToImage(base64);
+
+    if (baseImage == null) {
+      return null;
+    }
+    // Créer un objet InputImage à partir de l'image Base64
+    InputImage inputImage = InputImage.fromBytes(
+      bytes: Uint8List.fromList(base64Decode(base64)),
+      metadata: InputImageMetadata(
+        size: Size(
+          baseImage.width.toDouble(),
+          baseImage.height.toDouble(),
+        ),
+        rotation: InputImageRotation
+            .rotation0deg, // Ajuste la rotation selon les besoins
+        format: InputImageFormat.yuv420,
+        bytesPerRow: baseImage.bitsPerChannel, // Format de l'image
+      ),
+    );
+
+    return inputImage;
+  }
+
+  /// Convert CameraImage from MlKit Image
+  static InputImage? getInputImageFromCamera(
     CameraImage cameraImage,
     CameraDescription description,
   ) {

@@ -14,21 +14,21 @@ class RecognizingController extends FaceController {
     required this.successResult,
     required super.cameraError,
     required List<FaceRecognition> registeredFaces,
-    super.removeBlurredResult = true,
   }) : super(
           cameraLensDirection: CameraLensDirection.back,
           registeredFaces: registeredFaces,
         );
 
   @override
-  Future<FaceImage?> detectFace(
+  Future<FaceImage?> detectFaceCameraImage(
     CameraImage frame,
     CameraDescription description,
   ) async {
     if (recognizingFinish) {
       return null;
     }
-    FaceImage? faceImage = await super.detectFace(frame, description);
+    FaceImage? faceImage =
+        await super.detectFaceCameraImage(frame, description);
     if (faceImage == null) {
       return null;
     }

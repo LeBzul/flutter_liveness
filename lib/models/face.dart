@@ -40,7 +40,30 @@ class FaceImage {
     return _faceRecognition;
   }
 
-  static Future<img.Image?> generateFaceImage(
+  static Future<img.Image> generateFaceImageWithImage(
+    mlkit.Face face,
+    img.Image baseImage,
+  ) async {
+    // Convert CameraImage to Image and rotate it so that our frame will be in a portrait
+    img.Image image = img.copyRotate(
+      baseImage,
+      angle: 0,
+    );
+
+    Rect faceRect = face.boundingBox;
+    // Crop image to only have the head/face
+    img.Image copyCrop = img.copyCrop(
+      image,
+      x: faceRect.left.toInt(),
+      y: faceRect.top.toInt(),
+      width: faceRect.width.toInt(),
+      height: faceRect.height.toInt(),
+    );
+
+    return copyCrop;
+  }
+
+  static Future<img.Image?> generateFaceImageWithCameraImage(
     mlkit.Face face,
     CameraImage frame,
     CameraDescription cameraDescription,

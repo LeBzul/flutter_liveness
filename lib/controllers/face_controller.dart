@@ -48,14 +48,12 @@ class FaceController {
   FaceDetector? faceDetector;
   //Face recognizer
   late FaceRecognizer faceRecognizer;
-  bool removeBlurredResult;
 
   FaceController({
     required this.stateChangeListener,
     required this.cameraError,
     required List<FaceRecognition> registeredFaces,
     CameraLensDirection cameraLensDirection = CameraLensDirection.front,
-    this.removeBlurredResult = true,
   }) {
     //Initialize mlkit face detector
     faceDetector = FaceDetector(
@@ -134,41 +132,30 @@ class FaceController {
     CameraDescription description,
   ) async {
     cameraBusy = true;
-    await detectFace(
+    await detectFaceCameraImage(
       frame,
       description,
     );
     cameraBusy = false;
   }
 
-  Future<FaceImage?> detectFace(
+  Future<FaceImage?> detectFaceCameraImage(
     CameraImage frame,
     CameraDescription description,
   ) async {
     //Convert CameraImage from MlKit Image
-    InputImage? inputImage = ImageHelper.getInputImage(
+    InputImage? inputImage = ImageHelper.getInputImageFromCamera(
       frame,
       description,
     );
 
-    FaceDetector? detector = faceDetector;
     if (inputImage == null) {
       return null;
     }
-    if (detector == null) {
-      return null;
-    }
 
-    //Face detector return List of all faces detected in CameraImage
-    List<Face> faces = await detector.processImage(
-      inputImage,
-    );
+    List<Face> faces = await detectFaceFromInputImage(inputImage);
 
-    if (faces.isEmpty) {
-      return null;
-    }
-
-    img.Image? image = await FaceImage.generateFaceImage(
+    img.Image? image = await FaceImage.generateFaceImageWithCameraImage(
       faces.first,
       frame,
       description,
@@ -182,6 +169,44 @@ class FaceController {
       image: image,
       faceRecognizer: faceRecognizer,
     );
+  }
+
+  Future<FaceImage?> detectFaceWithImage(String base64) async {
+    //Convert CameraImage from MlKit Image
+    InputImage? inputImage = ImageHelper.getInputImageFromBase64(base64);
+    img.Image? baseImage = ImageHelper.base64ToImage(base64);
+
+    if (inputImage == null || baseImage == null) {
+      return null;
+    }
+
+    List<Face> faces = await detectFaceFromInputImage(inputImage);
+
+    img.Image? image = await FaceImage.generateFaceImageWithImage(
+      faces.first,
+      baseImage,
+    );
+
+    return FaceImage(
+      face: faces.first,
+      image: image,
+      faceRecognizer: faceRecognizer,
+    );
+  }
+
+  Future<List<Face>> detectFaceFromInputImage(InputImage inputImage) async {
+    FaceDetector? detector = faceDetector;
+    List<Face> faces = [];
+    if (detector == null) {
+      return faces;
+    }
+
+    //Face detector return List of all faces detected in CameraImage
+    faces = await detector.processImage(
+      inputImage,
+    );
+
+    return faces;
   }
 
   void dispose() {

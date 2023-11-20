@@ -34,7 +34,7 @@ class _LivenessScreenState extends State<LivenessScreen> {
             liveNessPassiveConditions: [
               LivenessEyeBlink(),
             ],
-            livenessSuccessResult: (liveness, faces) {
+            livenessSuccessResult: (liveness, faces, distance) {
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -58,6 +58,7 @@ class _LivenessScreenState extends State<LivenessScreen> {
               setState(() {});
             },
             instructionsOverlay: buildInstructionOverlay(),
+            identityImageBase64: 'SET_WITH_CNI_BASE_64',
           ),
         ),
       ),

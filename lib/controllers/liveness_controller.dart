@@ -15,9 +15,16 @@ class LivenessController extends FaceController {
 
   List<LivenessCondition> liveNessStepConditions;
   List<LivenessCondition> liveNessPassiveStepConditions;
-  final Function(LivenessProcess liveness, List<FaceRecognition> faceRecognitions) livenessSuccessResult;
-  final Function(LivenessCondition? actualLivenessCondition)? actualLivenessChange;
+  final Function(
+    LivenessProcess liveness,
+    List<FaceRecognition> faceRecognitions,
+    double distance,
+  ) livenessSuccessResult;
+
+  final Function(LivenessCondition? actualLivenessCondition)?
+      actualLivenessChange;
   final Function(List<LivenessCondition> errorConditions) livenessErrorResult;
+  String identityImageBase64;
 
   LivenessController({
     required super.stateChangeListener,
@@ -25,8 +32,8 @@ class LivenessController extends FaceController {
     required this.liveNessPassiveStepConditions,
     required this.livenessSuccessResult,
     required this.livenessErrorResult,
+    required this.identityImageBase64,
     this.actualLivenessChange,
-    super.removeBlurredResult = true,
   }) : super(
           cameraError: () {
             livenessErrorResult([]);
@@ -44,14 +51,15 @@ class LivenessController extends FaceController {
   }
 
   @override
-  Future<FaceImage?> detectFace(
+  Future<FaceImage?> detectFaceCameraImage(
     CameraImage frame,
     CameraDescription description,
   ) async {
     if (liveNess.isCompleted) {
       return null;
     }
-    FaceImage? faceImage = await super.detectFace(frame, description);
+    FaceImage? faceImage =
+        await super.detectFaceCameraImage(frame, description);
     if (faceImage == null) {
       return null;
     }
@@ -67,16 +75,34 @@ class LivenessController extends FaceController {
     if (liveNess.isCompleted) {
       List<LivenessCondition> compareErrorsList = await _checkAll();
       if (compareErrorsList.isEmpty) {
-        livenessSuccessResult.call(
-          liveNess,
-          await _getAllFaceRecognition(),
-        );
+        _identityVerificationLiveness();
       } else {
         livenessErrorResult.call(compareErrorsList);
       }
     }
     state = ControllerState.refresh;
     return faceImage;
+  }
+
+  void _identityVerificationLiveness() async {
+    FaceImage? faceImage = await detectFaceWithImage(identityImageBase64);
+    if (faceImage == null) {
+      return;
+    }
+
+    FaceRecognition? faceRecognition = await faceImage.faceRecognition();
+    if (faceRecognition == null) {
+      return;
+    }
+    if (faceRecognition.distance > FaceController.maxRecognitionDistance) {
+      return null;
+    }
+
+    livenessSuccessResult.call(
+      liveNess,
+      await _getAllFaceRecognition(),
+      faceRecognition.distance,
+    );
   }
 
   Future<List<LivenessCondition>> _checkAll() async {
@@ -87,7 +113,8 @@ class LivenessController extends FaceController {
     List<LivenessCondition> conditionResultErrors = [];
 
     /// 1) On compare toutes les images d'une meme condition
-    for (LivenessCondition livenessCondition in liveNess.allLivenessCondition()) {
+    for (LivenessCondition livenessCondition
+        in liveNess.allLivenessCondition()) {
       // On compare toutes les conditions de la liste
       faceRecognizer.registered.clear();
       for (var value in livenessCondition.conditionResult.values) {
@@ -96,7 +123,8 @@ class LivenessController extends FaceController {
           conditionResultErrors.add(livenessCondition);
           continue;
         }
-        FaceRecognition? faceRecognition = await liveNessConditionResult.faceImage.faceRecognition();
+        FaceRecognition? faceRecognition =
+            await liveNessConditionResult.faceImage.faceRecognition();
         if (faceRecognition == null) {
           conditionResultErrors.add(livenessCondition);
           continue;
@@ -115,20 +143,23 @@ class LivenessController extends FaceController {
 
     /// 2) On compare la 1ere images de chaques conditions
     faceRecognizer.registered.clear();
-    for (LivenessCondition livenessCondition in liveNess.allLivenessCondition()) {
+    for (LivenessCondition livenessCondition
+        in liveNess.allLivenessCondition()) {
       if (livenessCondition.conditionResult.isEmpty) {
         conditionResultErrors.add(livenessCondition);
         continue;
       }
-      FaceRecognition? faceRecognition =
-          await livenessCondition.conditionResult.values.first?.faceImage.faceRecognition();
+      FaceRecognition? faceRecognition = await livenessCondition
+          .conditionResult.values.first?.faceImage
+          .faceRecognition();
       if (faceRecognition == null) {
         conditionResultErrors.add(livenessCondition);
         continue;
       }
       if (livenessCondition == liveNess.allLivenessCondition().first) {
         faceRecognizer.registered.add(faceRecognition);
-      } else if (faceRecognition.distance > FaceController.maxRecognitionDistance) {
+      } else if (faceRecognition.distance >
+          FaceController.maxRecognitionDistance) {
         /// Comme on ne peut pas determiner lequel est réelement en erreurs, on les mets tous en erreurs
         return liveNess.allLivenessCondition();
       }
@@ -139,7 +170,8 @@ class LivenessController extends FaceController {
 
   Future<List<FaceRecognition>> _getAllFaceRecognition() async {
     List<FaceRecognition> faceRecognitionList = [];
-    for (LivenessCondition livenessCondition in liveNess.allLivenessCondition()) {
+    for (LivenessCondition livenessCondition
+        in liveNess.allLivenessCondition()) {
       for (var element in livenessCondition.conditionResult.values) {
         if (element == null) {
           continue;
