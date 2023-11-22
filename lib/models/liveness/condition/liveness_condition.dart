@@ -2,27 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:liveness/models/face.dart';
 
+import 'condition.dart';
 import 'liveness_condition_result.dart';
 
-abstract class LivenessCondition {
-  String instruction;
-  String name;
-
+abstract class LivenessCondition extends Condition {
   List<List<LivenessRangeCondition>> rangesConditionsList;
-
-  Map<int, LivenessConditionResult?> conditionResult = <int, LivenessConditionResult?>{};
 
   LivenessCondition({
     required this.rangesConditionsList,
-    required this.name,
-    required this.instruction,
-  }) {
-    _initConditionResult();
-  }
+    required super.name,
+    required super.instruction,
+  });
 
-  bool get alive => !conditionResult.containsValue(null);
-
-  void _initConditionResult() {
+  @override
+  void initConditionResult() {
     int i = 0;
     conditionResult = <int, LivenessConditionResult?>{};
     for (var _ in rangesConditionsList) {
@@ -64,46 +57,6 @@ abstract class LivenessCondition {
       }
       indexRangesConditions++;
     }
-  }
-/*
-  void update(
-    Face face,
-    img.Image image,
-    FaceRecognition recognition,
-  ) {
-    int indexRangesConditions = 0;
-    for (var rangesList in rangesConditionsList) {
-      List<double> probability = [];
-
-      int indexRange = 0;
-      for (var range in rangesList) {
-        double? value = FaceMap.getValue(range.analyseFaceValue, face);
-        if (value != null && value < range.range.end && value > range.range.start) {
-          LivenessConditionResult? lastConditionResult =
-              conditionResult.containsKey(indexRangesConditions) ? conditionResult[indexRangesConditions] : null;
-          if (lastConditionResult == null ||
-              range.optimalValue.abs() - lastConditionResult.value[indexRange].abs() >
-                  range.optimalValue.abs() - value.abs()) {
-            probability.add(value);
-          }
-        }
-        indexRange++;
-      }
-
-      if (probability.length == rangesList.length) {
-        conditionResult[indexRangesConditions] = LivenessConditionResult(
-          name: name,
-          value: probability,
-          //  recognition: recognition,
-          imageResult: image,
-        );
-      }
-      indexRangesConditions++;
-    }
-  }*/
-
-  void reset() {
-    _initConditionResult();
   }
 
   Map<String, dynamic> toJson() {

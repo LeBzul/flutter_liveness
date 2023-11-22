@@ -3,25 +3,27 @@ import 'package:flutter/material.dart';
 import 'package:liveness/controllers/face_controller.dart';
 import 'package:liveness/controllers/liveness_controller.dart';
 import 'package:liveness/models/face_recognizer/model/face_recognition.dart';
+import 'package:liveness/models/liveness/condition/condition.dart';
+import 'package:liveness/models/liveness/condition/identity_condition.dart';
 import 'package:liveness/models/liveness/condition/liveness_condition.dart';
 import 'package:liveness/models/liveness/liveness_process.dart';
 
 class LivenessWidget extends StatefulWidget {
   final List<LivenessCondition> liveNessActiveConditions;
   final List<LivenessCondition> liveNessPassiveConditions;
+  final IdentityCondition identityCondition;
   final Function(
     LivenessProcess liveness,
     List<FaceRecognition> faceRecognitions,
-    double distance,
+    IdentityCondition identityCondition,
   ) livenessSuccessResult;
-  final Function(LivenessCondition? actualLivenessCondition)?
-      actualLivenessChange;
+  final Function(Condition? actualCondition)? stepConditionChange;
   final Function(
     LivenessProcess liveness,
-    List<LivenessCondition> errorConditions,
+    List<Condition> errorConditions,
   ) livenessErrorResult;
 
-  final String identityImageBase64;
+//  final String identityImageBase64;
   final Widget? instructionsOverlay;
 
   const LivenessWidget({
@@ -30,8 +32,8 @@ class LivenessWidget extends StatefulWidget {
     required this.liveNessPassiveConditions,
     required this.livenessSuccessResult,
     required this.livenessErrorResult,
-    required this.identityImageBase64,
-    this.actualLivenessChange,
+    required this.identityCondition,
+    this.stepConditionChange,
     this.instructionsOverlay,
   }) : super(key: key);
 
@@ -56,11 +58,11 @@ class _LivenessWidgetState extends State<LivenessWidget> {
       },
       liveNessStepConditions: widget.liveNessActiveConditions,
       liveNessPassiveStepConditions: widget.liveNessPassiveConditions,
-      livenessSuccessResult: (liveness, faceRecognitions, distance) {
+      livenessSuccessResult: (liveness, faceRecognitions, identityCondition) {
         widget.livenessSuccessResult.call(
           liveness,
           faceRecognitions,
-          distance,
+          identityCondition,
         );
         setState(() {});
       },
@@ -71,8 +73,8 @@ class _LivenessWidgetState extends State<LivenessWidget> {
         );
         setState(() {});
       },
-      actualLivenessChange: widget.actualLivenessChange,
-      identityImageBase64: widget.identityImageBase64,
+      stepConditionChange: widget.stepConditionChange,
+      identityCondition: widget.identityCondition,
     );
   }
 

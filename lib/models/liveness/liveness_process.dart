@@ -1,4 +1,3 @@
-
 import 'package:liveness/helper/list_helper.dart';
 import 'package:liveness/models/face.dart';
 import 'package:liveness/models/liveness/condition/liveness_condition_result.dart';
@@ -17,12 +16,12 @@ class LivenessProcess {
 
   bool get isCompleted {
     for (var condition in liveNessActiveConditions) {
-      if (condition.alive == false) {
+      if (condition.isValidated == false) {
         return false;
       }
     }
     for (var condition in liveNessPassiveConditions) {
-      if (condition.alive == false) {
+      if (condition.isValidated == false) {
         return false;
       }
     }
@@ -79,33 +78,6 @@ class LivenessProcess {
       element.updateFace(faceImage);
     }
   }
-
-/*
-  void updateLiveNess(
-    FaceRecognition recognition,
-  ) {
-    //Pas très fiable apparement
-    if (faceId != recognition.faceImage.face.trackingId) {
-      //  reset();
-    }
-
-    faceId = recognition.faceImage.face.trackingId;
-
-    actualStep?.update(
-      recognition.faceImage.face,
-      recognition.faceImage.image,
-      recognition,
-    );
-
-    for (var element in liveNessPassiveConditions) {
-      element.update(
-        recognition.faceImage.face,
-        recognition.faceImage.image,
-        recognition,
-      );
-    }
-  }
-*/
 
   List<LivenessCondition> allLivenessCondition() {
     List<LivenessCondition> conditionsList = [];

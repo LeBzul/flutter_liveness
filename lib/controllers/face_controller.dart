@@ -149,11 +149,15 @@ class FaceController {
       description,
     );
 
-    if (inputImage == null) {
+    FaceDetector? faceDetector = this.faceDetector;
+    if (inputImage == null || faceDetector == null) {
       return null;
     }
 
-    List<Face> faces = await detectFaceFromInputImage(inputImage);
+    List<Face> faces = await ImageHelper.detectFaceFromInputImage(inputImage, faceDetector);
+    if (faces.isEmpty) {
+      return null;
+    }
 
     img.Image? image = await FaceImage.generateFaceImageWithCameraImage(
       faces.first,
@@ -171,49 +175,11 @@ class FaceController {
     );
   }
 
-  Future<FaceImage?> detectFaceWithImage(String base64) async {
-    //Convert CameraImage from MlKit Image
-    InputImage? inputImage = ImageHelper.getInputImageFromBase64(base64);
-    img.Image? baseImage = ImageHelper.base64ToImage(base64);
-
-    if (inputImage == null || baseImage == null) {
-      return null;
-    }
-
-    List<Face> faces = await detectFaceFromInputImage(inputImage);
-
-    img.Image? image = await FaceImage.generateFaceImageWithImage(
-      faces.first,
-      baseImage,
-    );
-
-    return FaceImage(
-      face: faces.first,
-      image: image,
-      faceRecognizer: faceRecognizer,
-    );
-  }
-
-  Future<List<Face>> detectFaceFromInputImage(InputImage inputImage) async {
-    FaceDetector? detector = faceDetector;
-    List<Face> faces = [];
-    if (detector == null) {
-      return faces;
-    }
-
-    //Face detector return List of all faces detected in CameraImage
-    faces = await detector.processImage(
-      inputImage,
-    );
-
-    return faces;
-  }
-
   void dispose() {
     try {
       cameraController?.stopImageStream();
     } on CameraException catch (_, e) {
-      // Le streaming est déjà lancé
+      // Streaming est déjà stoppé
     }
     cameraController?.dispose();
   }

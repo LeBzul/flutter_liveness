@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image/image.dart' as img;
+import 'package:path_provider/path_provider.dart';
 
 class ImageHelper {
   static Future<img.Image?> convertImage(CameraImage image) async {
@@ -55,18 +57,14 @@ class ImageHelper {
     for (final p in convertImage) {
       final x = p.x;
       final y = p.y;
-      final uvIndex =
-          uvPixelStride * (x / 2).floor() + uvRowStride * (y / 2).floor();
+      final uvIndex = uvPixelStride * (x / 2).floor() + uvRowStride * (y / 2).floor();
       final index = y * uvRowStride +
           x; // Use the row stride instead of the image width as some devices pad the image data, and in those cases the image width != bytesPerRow. Using width will give you a distored image.
       final yp = image.planes[0].bytes[index];
       final up = image.planes[1].bytes[uvIndex];
       final vp = image.planes[2].bytes[uvIndex];
       p.r = (yp + vp * 1436 / 1024 - 179).round().clamp(0, 255).toInt();
-      p.g = (yp - up * 46549 / 131072 + 44 - vp * 93604 / 131072 + 91)
-          .round()
-          .clamp(0, 255)
-          .toInt();
+      p.g = (yp - up * 46549 / 131072 + 44 - vp * 93604 / 131072 + 91).round().clamp(0, 255).toInt();
       p.b = (yp + up * 1814 / 1024 - 227).round().clamp(0, 255).toInt();
     }
     return convertImage;
@@ -77,30 +75,34 @@ class ImageHelper {
   }
 
   /// Convert CameraImage from MlKit Image
-  static InputImage? getInputImageFromBase64(
+  static Future<InputImage?> getInputImageFromBase64(
     String base64,
-  ) {
+  ) async {
     final baseImage = base64ToImage(base64);
 
     if (baseImage == null) {
       return null;
     }
-    // Créer un objet InputImage à partir de l'image Base64
-    InputImage inputImage = InputImage.fromBytes(
-      bytes: Uint8List.fromList(base64Decode(base64)),
-      metadata: InputImageMetadata(
-        size: Size(
-          baseImage.width.toDouble(),
-          baseImage.height.toDouble(),
-        ),
-        rotation: InputImageRotation
-            .rotation0deg, // Ajuste la rotation selon les besoins
-        format: InputImageFormat.yuv420,
-        bytesPerRow: baseImage.bitsPerChannel, // Format de l'image
-      ),
+
+    var tempDir = await getTemporaryDirectory();
+    String fullPath = "${tempDir.path}/identity.jpg";
+
+    final img.Image orientedImage = img.bakeOrientation(baseImage);
+    final inputImage = InputImage.fromFile(await File(fullPath).writeAsBytes(img.encodeJpg(orientedImage)));
+    return inputImage;
+  }
+
+  static Future<List<Face>> detectFaceFromInputImage(
+    InputImage inputImage,
+    FaceDetector detector,
+  ) async {
+    List<Face> faces = [];
+    //Face detector return List of all faces detected in CameraImage
+    faces = await detector.processImage(
+      inputImage,
     );
 
-    return inputImage;
+    return faces;
   }
 
   /// Convert CameraImage from MlKit Image
