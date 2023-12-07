@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
-import 'package:liveness/models/face.dart';
+import 'package:liveness/models/condition/recognition_condition.dart';
+import 'package:liveness/models/condition/recognition_condition_result.dart';
+import 'package:liveness/models/face_recognizer/model/face.dart';
 
-import 'condition.dart';
-import 'liveness_condition_result.dart';
-
-abstract class LivenessCondition extends Condition {
+abstract class LivenessCondition extends RecognitionCondition {
   List<List<LivenessRangeCondition>> rangesConditionsList;
 
   LivenessCondition({
@@ -17,7 +16,7 @@ abstract class LivenessCondition extends Condition {
   @override
   void initConditionResult() {
     int i = 0;
-    conditionResult = <int, LivenessConditionResult?>{};
+    conditionResult = <int, RecognitionConditionResult?>{};
     for (var _ in rangesConditionsList) {
       conditionResult.putIfAbsent(i++, () => null);
     }
@@ -37,7 +36,7 @@ abstract class LivenessCondition extends Condition {
           faceImage.face,
         );
         if (value != null && value < range.range.end && value > range.range.start) {
-          LivenessConditionResult? lastConditionResult =
+          RecognitionConditionResult? lastConditionResult =
               conditionResult.containsKey(indexRangesConditions) ? conditionResult[indexRangesConditions] : null;
           if (lastConditionResult == null ||
               range.optimalValue.abs() - lastConditionResult.value[indexRange].abs() >
@@ -49,7 +48,7 @@ abstract class LivenessCondition extends Condition {
       }
 
       if (probability.length == rangesList.length) {
-        conditionResult[indexRangesConditions] = LivenessConditionResult(
+        conditionResult[indexRangesConditions] = RecognitionConditionResult(
           name: name,
           value: probability,
           faceImage: faceImage,

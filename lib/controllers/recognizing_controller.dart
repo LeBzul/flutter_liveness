@@ -1,6 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:liveness/controllers/face_controller.dart';
-import 'package:liveness/models/face.dart';
+import 'package:liveness/models/face_recognizer/model/face.dart';
 import 'package:liveness/models/face_recognizer/model/face_recognition.dart';
 
 class RecognizingController extends FaceController {
@@ -27,8 +27,7 @@ class RecognizingController extends FaceController {
     if (recognizingFinish) {
       return null;
     }
-    FaceImage? faceImage =
-        await super.detectFaceCameraImage(frame, description);
+    FaceImage? faceImage = await super.detectFaceCameraImage(frame, description);
     if (faceImage == null) {
       return null;
     }

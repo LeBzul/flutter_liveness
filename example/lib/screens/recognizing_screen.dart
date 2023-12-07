@@ -1,7 +1,6 @@
-import 'package:example/screens/report_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:liveness/models/condition/liveness/liveness_process.dart';
 import 'package:liveness/models/face_recognizer/model/face_recognition.dart';
-import 'package:liveness/models/liveness/liveness_process.dart';
 import 'package:liveness/widget/recognizing_widget.dart';
 
 class RecognizingScreen extends StatefulWidget {
@@ -32,17 +31,7 @@ class _RecognizingScreenState extends State<RecognizingScreen> {
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           child: RecognizingWidget(
-            successResult: (recognition) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ReportScreen(
-                    liveness: widget.liveness,
-                    faceRecognition: recognition,
-                  ),
-                ),
-              );
-            },
+            successResult: (recognition) {},
             errorResult: () {},
             faceRecognitions: widget.faceRecognitions,
           ),

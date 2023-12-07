@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:liveness/models/liveness/condition/liveness_condition.dart';
+import 'package:liveness/models/condition/liveness/liveness_condition.dart';
 
 enum LiveNessTurnFaceDirection {
   left,

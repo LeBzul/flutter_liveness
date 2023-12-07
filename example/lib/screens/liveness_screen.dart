@@ -1,8 +1,6 @@
 import 'package:example/screens/recognizing_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:liveness/liveness.dart';
-import 'package:liveness/models/liveness/condition/condition.dart';
-import 'package:liveness/models/liveness/condition/identity_condition.dart';
 
 class LivenessScreen extends StatefulWidget {
   const LivenessScreen({Key? key}) : super(key: key);
@@ -12,7 +10,7 @@ class LivenessScreen extends StatefulWidget {
 }
 
 class _LivenessScreenState extends State<LivenessScreen> {
-  Condition? actualStep;
+  RecognitionCondition? actualStep;
 
   @override
   void initState() {
@@ -54,29 +52,17 @@ class _LivenessScreenState extends State<LivenessScreen> {
               }
               setState(() {});
             },
-            stepConditionChange: (actualLivenessCondition) {
+            stepConditionChange: (actualLivenessCondition, step, maxStep) {
               actualStep = actualLivenessCondition;
               setState(() {});
             },
-            instructionsOverlay: buildInstructionOverlay(),
             identityCondition: IdentityCondition(
               name: 'Identity verification',
-              imagesBase64: ['SET_WITH_CNI_BASE_64'],
+              imagesBase64: ['SET_WITH_CNI_IMAGE_BASE_64'],
               instruction: 'Wait',
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget buildInstructionOverlay() {
-    return Container(
-      color: Colors.white.withAlpha(100),
-      width: 50,
-      height: 100,
-      child: Center(
-        child: Text('${actualStep?.instruction}'),
       ),
     );
   }

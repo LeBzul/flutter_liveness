@@ -2,8 +2,8 @@ import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image/image.dart' as img;
-import 'package:liveness/models/face.dart';
 import 'package:liveness/models/face_recognizer/face_recognizer.dart';
+import 'package:liveness/models/face_recognizer/model/face.dart';
 import 'package:liveness/models/face_recognizer/model/face_recognition.dart';
 
 import '../helper/image_helper.dart';

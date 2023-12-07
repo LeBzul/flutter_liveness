@@ -1,11 +1,11 @@
-import 'package:liveness/models/face.dart';
+import 'package:liveness/models/face_recognizer/model/face.dart';
 
-class LivenessConditionResult {
+class RecognitionConditionResult {
   String name;
   List<double> value;
   FaceImage faceImage;
 
-  LivenessConditionResult({
+  RecognitionConditionResult({
     required this.name,
     required this.value,
     required this.faceImage,

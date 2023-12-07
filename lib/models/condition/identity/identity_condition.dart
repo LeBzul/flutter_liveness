@@ -2,14 +2,13 @@ import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image/image.dart' as img;
 import 'package:liveness/controllers/face_controller.dart';
 import 'package:liveness/helper/image_helper.dart';
-import 'package:liveness/models/face.dart';
+import 'package:liveness/models/condition/recognition_condition.dart';
+import 'package:liveness/models/condition/recognition_condition_result.dart';
 import 'package:liveness/models/face_recognizer/face_recognizer.dart';
+import 'package:liveness/models/face_recognizer/model/face.dart';
 import 'package:liveness/models/face_recognizer/model/face_recognition.dart';
-import 'package:liveness/models/liveness/condition/condition.dart';
 
-import 'liveness_condition_result.dart';
-
-class IdentityCondition extends Condition {
+class IdentityCondition extends RecognitionCondition {
   List<String> imagesBase64;
   double? distance;
 
@@ -31,7 +30,7 @@ class IdentityCondition extends Condition {
   @override
   void initConditionResult() {
     int i = 0;
-    conditionResult = <int, LivenessConditionResult?>{};
+    conditionResult = <int, RecognitionConditionResult?>{};
     for (var _ in imagesBase64) {
       conditionResult.putIfAbsent(i++, () => null);
     }
@@ -62,7 +61,7 @@ class IdentityCondition extends Condition {
         continue;
       }
 
-      conditionResult[indexRangesConditions] = LivenessConditionResult(
+      conditionResult[indexRangesConditions] = RecognitionConditionResult(
         name: name,
         value: [faceRecognition.distance],
         faceImage: faceImage,
@@ -75,7 +74,7 @@ class IdentityCondition extends Condition {
     String base64,
     FaceRecognizer faceRecognizer,
   ) async {
-    //Convert CameraImage from MlKit Image
+    //Convert Image from MlKit Image
     InputImage? inputImage = await ImageHelper.getInputImageFromBase64(base64);
     img.Image? baseImage = ImageHelper.base64ToImage(base64);
 

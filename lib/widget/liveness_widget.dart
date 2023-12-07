@@ -2,11 +2,11 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:liveness/controllers/face_controller.dart';
 import 'package:liveness/controllers/liveness_controller.dart';
+import 'package:liveness/models/condition/identity/identity_condition.dart';
+import 'package:liveness/models/condition/liveness/liveness_condition.dart';
+import 'package:liveness/models/condition/liveness/liveness_process.dart';
+import 'package:liveness/models/condition/recognition_condition.dart';
 import 'package:liveness/models/face_recognizer/model/face_recognition.dart';
-import 'package:liveness/models/liveness/condition/condition.dart';
-import 'package:liveness/models/liveness/condition/identity_condition.dart';
-import 'package:liveness/models/liveness/condition/liveness_condition.dart';
-import 'package:liveness/models/liveness/liveness_process.dart';
 
 class LivenessWidget extends StatefulWidget {
   final List<LivenessCondition> liveNessActiveConditions;
@@ -17,14 +17,18 @@ class LivenessWidget extends StatefulWidget {
     List<FaceRecognition> faceRecognitions,
     IdentityCondition identityCondition,
   ) livenessSuccessResult;
-  final Function(Condition? actualCondition)? stepConditionChange;
+  final Function(
+    RecognitionCondition? actualCondition,
+    int stepCount,
+    int maxStep,
+  )? stepConditionChange;
   final Function(
     LivenessProcess liveness,
-    List<Condition> errorConditions,
+    List<RecognitionCondition> errorConditions,
   ) livenessErrorResult;
 
-//  final String identityImageBase64;
-  final Widget? instructionsOverlay;
+  final bool showInstructions;
+  final bool showPictureFrame;
 
   const LivenessWidget({
     Key? key,
@@ -34,7 +38,8 @@ class LivenessWidget extends StatefulWidget {
     required this.livenessErrorResult,
     required this.identityCondition,
     this.stepConditionChange,
-    this.instructionsOverlay,
+    this.showInstructions = true,
+    this.showPictureFrame = true,
   }) : super(key: key);
 
   @override
@@ -117,7 +122,21 @@ class _LivenessWidgetState extends State<LivenessWidget> {
           aspectRatio: controller.value.aspectRatio,
           child: CameraPreview(controller),
         ),
-        buildOverlay(),
+        widget.showPictureFrame
+            ? LayoutBuilder(
+                builder: (context, constraints) {
+                  return CustomPaint(
+                    painter: _LivenessPictureFramePainter(
+                      Size(
+                        constraints.maxWidth,
+                        constraints.maxHeight - (widget.showInstructions ? 100 : 0),
+                      ),
+                    ),
+                  );
+                },
+              )
+            : Container(),
+        widget.showInstructions ? buildOverlay() : Container(),
       ],
     );
   }
@@ -127,14 +146,13 @@ class _LivenessWidgetState extends State<LivenessWidget> {
       top: 0.0,
       left: 0.0,
       width: MediaQuery.of(context).size.width,
-      child: widget.instructionsOverlay ??
-          Container(
-            color: Colors.white.withAlpha(100),
-            height: 100,
-            child: Center(
-              child: Text(_controller.liveNess.actualStep?.instruction ?? ""),
-            ),
-          ),
+      child: Container(
+        color: Colors.white.withAlpha(100),
+        height: 100,
+        child: Center(
+          child: Text(_controller.liveNess.actualStep?.instruction ?? ""),
+        ),
+      ),
     );
   }
 
@@ -142,5 +160,79 @@ class _LivenessWidgetState extends State<LivenessWidget> {
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+}
+
+class _LivenessPictureFramePainter extends CustomPainter {
+  Size size;
+
+  _LivenessPictureFramePainter(
+    this.size,
+  );
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Calcul du centre du conteneur
+    double centerX = size.width / 2;
+    double centerY = size.height / 2;
+
+    canvas.saveLayer(Rect.largest, Paint());
+
+    // In your paint method
+    final paint = Paint()
+      ..shader = RadialGradient(
+        colors: [
+          Colors.white.withAlpha(70),
+          Colors.white,
+        ],
+      ).createShader(
+        Rect.fromCircle(
+          center: Offset(
+            centerX,
+            centerY,
+          ),
+          radius: size.height / 2,
+        ),
+      );
+
+    const double widthToHeightRatio = 0.6;
+    canvas.drawRect(
+      Rect.fromLTWH(
+        0,
+        0,
+        this.size.width,
+        this.size.height,
+      ),
+      paint,
+    );
+
+    const double paddingRatio = 0.1;
+
+    // Calcul du rayon en fonction de la largeur de l'écran et du ratio
+    double radiusX = (size.width - 2 * size.width * paddingRatio) / 2;
+    double radiusY = radiusX / widthToHeightRatio;
+
+    // Vérification pour éviter que l'ovale ne dépasse de l'écran
+    if (radiusY > size.height / 2) {
+      radiusY = size.height / 2;
+      radiusX = radiusY * widthToHeightRatio;
+    }
+
+    // Dessine l'oval avec drawOval
+    Rect ovalRect = Rect.fromCenter(
+      center: Offset(centerX, centerY),
+      width: radiusX * 2,
+      height: radiusY * 2,
+    );
+    canvas.drawOval(
+      ovalRect,
+      Paint()..blendMode = BlendMode.clear,
+    );
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
   }
 }

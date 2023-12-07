@@ -1,19 +1,16 @@
 import 'package:camera/camera.dart';
 import 'package:liveness/controllers/face_controller.dart';
-import 'package:liveness/models/face.dart';
+import 'package:liveness/models/condition/identity/identity_condition.dart';
+import 'package:liveness/models/condition/liveness/liveness_condition.dart';
+import 'package:liveness/models/condition/recognition_condition.dart';
+import 'package:liveness/models/condition/recognition_condition_result.dart';
+import 'package:liveness/models/face_recognizer/model/face.dart';
 import 'package:liveness/models/face_recognizer/model/face_recognition.dart';
-import 'package:liveness/models/liveness/condition/condition.dart';
-import 'package:liveness/models/liveness/condition/identity_condition.dart';
-import 'package:liveness/models/liveness/condition/liveness_condition.dart';
-import 'package:liveness/models/liveness/condition/liveness_condition_result.dart';
 
-import '../models/liveness/liveness_process.dart';
+import '../models/condition/liveness/liveness_process.dart';
 
 class LivenessController extends FaceController {
-  LivenessProcess liveNess = LivenessProcess(
-    liveNessActiveConditions: [],
-    liveNessPassiveConditions: [],
-  );
+  LivenessProcess liveNess;
 
   List<LivenessCondition> liveNessStepConditions;
   List<LivenessCondition> liveNessPassiveStepConditions;
@@ -25,11 +22,13 @@ class LivenessController extends FaceController {
   ) livenessSuccessResult;
 
   final Function(
-    Condition? actualCondition,
+    RecognitionCondition? actualCondition,
+    int stepCount,
+    int maxStep,
   )? stepConditionChange;
 
   final Function(
-    List<Condition> errorConditions,
+    List<RecognitionCondition> errorConditions,
   ) livenessErrorResult;
 
   final IdentityCondition identityCondition;
@@ -42,20 +41,26 @@ class LivenessController extends FaceController {
     required this.livenessErrorResult,
     required this.identityCondition,
     this.stepConditionChange,
-  }) : super(
+  })  : liveNess = LivenessProcess(
+          liveNessActiveConditions: liveNessStepConditions,
+          liveNessPassiveConditions: liveNessPassiveStepConditions,
+          identityCondition: identityCondition,
+        ),
+        super(
           cameraError: () {
             livenessErrorResult([]);
           },
           registeredFaces: [],
-        ) {
-    liveNess.liveNessActiveConditions = liveNessStepConditions;
-    liveNess.liveNessPassiveConditions = liveNessPassiveStepConditions;
-  }
+        );
 
   @override
   void refreshCamera() async {
     super.refreshCamera();
-    stepConditionChange?.call(liveNess.actualStep);
+    stepConditionChange?.call(
+      liveNess.actualStep,
+      liveNess.stepCount,
+      liveNess.maxStep,
+    );
   }
 
   @override
@@ -63,7 +68,7 @@ class LivenessController extends FaceController {
     CameraImage frame,
     CameraDescription description,
   ) async {
-    if (liveNess.isCompleted) {
+    if (liveNess.livenessIsCompleted) {
       return null;
     }
     FaceImage? faceImage = await super.detectFaceCameraImage(frame, description);
@@ -71,16 +76,21 @@ class LivenessController extends FaceController {
       return null;
     }
 
-    LivenessCondition? lastCondition = liveNess.actualStep;
+    RecognitionCondition? lastCondition = liveNess.actualStep;
     liveNess.updateFaceLiveNess(
       faceImage,
     );
     if (lastCondition != liveNess.actualStep) {
-      stepConditionChange?.call(liveNess.actualStep);
+      stepConditionChange?.call(
+        liveNess.actualStep,
+        liveNess.stepCount,
+        liveNess.maxStep,
+      );
     }
 
-    if (liveNess.isCompleted) {
+    if (liveNess.livenessIsCompleted) {
       List<LivenessCondition> compareErrorsList = await _checkAll();
+
       if (compareErrorsList.isEmpty) {
         faceRecognizer.registered.clear();
         for (var condition in liveNessStepConditions) {
@@ -112,7 +122,7 @@ class LivenessController extends FaceController {
   }
 
   Future<List<LivenessCondition>> _checkAll() async {
-    if (!liveNess.isCompleted) {
+    if (!liveNess.livenessIsCompleted) {
       return liveNess.allLivenessCondition();
     }
 
@@ -123,7 +133,7 @@ class LivenessController extends FaceController {
       // On compare toutes les conditions de la liste
       faceRecognizer.registered.clear();
       for (var value in livenessCondition.conditionResult.values) {
-        LivenessConditionResult? liveNessConditionResult = value;
+        RecognitionConditionResult? liveNessConditionResult = value;
         if (liveNessConditionResult == null) {
           conditionResultErrors.add(livenessCondition);
           continue;

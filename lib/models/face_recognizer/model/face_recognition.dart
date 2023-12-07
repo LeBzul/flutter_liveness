@@ -1,4 +1,4 @@
-import 'package:liveness/models/face.dart';
+import 'package:liveness/models/face_recognizer/model/face.dart';
 
 class FaceRecognition {
   FaceImage faceImage;

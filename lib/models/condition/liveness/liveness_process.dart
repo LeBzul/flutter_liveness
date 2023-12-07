@@ -1,20 +1,22 @@
 import 'package:liveness/helper/list_helper.dart';
-import 'package:liveness/models/face.dart';
-import 'package:liveness/models/liveness/condition/liveness_condition_result.dart';
+import 'package:liveness/liveness.dart';
+import 'package:liveness/models/face_recognizer/model/face.dart';
 
-import 'condition/liveness_condition.dart';
+import 'liveness_condition.dart';
 
 class LivenessProcess {
   int? faceId;
 
   List<LivenessCondition> liveNessActiveConditions;
   List<LivenessCondition> liveNessPassiveConditions;
+  IdentityCondition identityCondition;
   LivenessProcess({
     required this.liveNessActiveConditions,
     required this.liveNessPassiveConditions,
+    required this.identityCondition,
   });
 
-  bool get isCompleted {
+  bool get livenessIsCompleted {
     for (var condition in liveNessActiveConditions) {
       if (condition.isValidated == false) {
         return false;
@@ -28,7 +30,7 @@ class LivenessProcess {
     return true;
   }
 
-  LivenessCondition? get actualStep {
+  RecognitionCondition? get actualStep {
     LivenessCondition? step = liveNessActiveConditions.firstWhereOrNull(
       (element) => element.conditionResult.containsValue(null),
     );
@@ -37,12 +39,42 @@ class LivenessProcess {
       return step;
     }
 
-    return liveNessPassiveConditions.firstWhereOrNull(
+    step = liveNessPassiveConditions.firstWhereOrNull(
       (element) => element.conditionResult.containsValue(null),
     );
+    if (step != null) {
+      return step;
+    }
+
+    return identityCondition;
   }
 
-  void reset({List<LivenessConditionResult>? conditionReset}) {
+  int get maxStep {
+    // Add one for indentification step
+    return liveNessActiveConditions.length + liveNessPassiveConditions.length + 1;
+  }
+
+  int get stepCount {
+    LivenessCondition? step = liveNessActiveConditions.firstWhereOrNull(
+      (element) => element.conditionResult.containsValue(null),
+    );
+
+    if (step != null) {
+      return liveNessActiveConditions.indexOf(step);
+    }
+
+    step = liveNessPassiveConditions.firstWhereOrNull(
+      (element) => element.conditionResult.containsValue(null),
+    );
+
+    if (step != null) {
+      return liveNessActiveConditions.length + liveNessPassiveConditions.indexOf(step);
+    }
+
+    return maxStep;
+  }
+
+  void reset({List<RecognitionConditionResult>? conditionReset}) {
     _resetCondition(
       conditions: liveNessActiveConditions,
       conditionsReset: conditionReset,
@@ -55,7 +87,7 @@ class LivenessProcess {
 
   void _resetCondition({
     required List<LivenessCondition> conditions,
-    List<LivenessConditionResult>? conditionsReset,
+    List<RecognitionConditionResult>? conditionsReset,
   }) {
     for (var condition in conditions) {
       if (conditionsReset == null) {
@@ -73,9 +105,12 @@ class LivenessProcess {
   void updateFaceLiveNess(
     FaceImage faceImage,
   ) {
-    actualStep?.updateFace(faceImage);
-    for (var element in liveNessPassiveConditions) {
-      element.updateFace(faceImage);
+    RecognitionCondition? actualStep = this.actualStep;
+    if (actualStep is LivenessCondition) {
+      actualStep.updateFace(faceImage);
+      for (var element in liveNessPassiveConditions) {
+        element.updateFace(faceImage);
+      }
     }
   }
 
@@ -90,11 +125,11 @@ class LivenessProcess {
     return conditionsList;
   }
 
-  List<List<LivenessConditionResult>> livenessConditionResults() {
-    List<List<LivenessConditionResult>> conditionsList = [];
+  List<List<RecognitionConditionResult>> livenessConditionResults() {
+    List<List<RecognitionConditionResult>> conditionsList = [];
     for (var element in liveNessActiveConditions) {
-      List<LivenessConditionResult> tempList = [];
-      List<LivenessConditionResult?> results = element.conditionResult.values.toList();
+      List<RecognitionConditionResult> tempList = [];
+      List<RecognitionConditionResult?> results = element.conditionResult.values.toList();
       for (var result in results) {
         if (result != null) {
           tempList.add(result);
@@ -104,8 +139,8 @@ class LivenessProcess {
     }
 
     for (var element in liveNessPassiveConditions) {
-      List<LivenessConditionResult> tempList = [];
-      List<LivenessConditionResult?> results = element.conditionResult.values.toList();
+      List<RecognitionConditionResult> tempList = [];
+      List<RecognitionConditionResult?> results = element.conditionResult.values.toList();
       for (var result in results) {
         if (result != null) {
           tempList.add(result);

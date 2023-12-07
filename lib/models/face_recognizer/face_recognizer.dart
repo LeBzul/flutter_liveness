@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/services.dart';
 import 'package:liveness/controllers/face_controller.dart';
-import 'package:liveness/models/face.dart';
+import 'package:liveness/models/face_recognizer/model/face.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
 
@@ -41,8 +41,7 @@ class FaceRecognizer {
 
   Future<void> loadModel() async {
     try {
-      final ByteData data =
-          await rootBundle.load('packages/liveness/assets/${modelName.value}');
+      final ByteData data = await rootBundle.load('packages/liveness/assets/${modelName.value}');
       final Uint8List bytes = data.buffer.asUint8List();
 
       Interpreter interpreter = Interpreter.fromBuffer(
@@ -70,8 +69,7 @@ class FaceRecognizer {
 
   FaceRecognition? recognize(FaceImage faceImage) {
     TensorBuffer? outputBuffer = _outputBuffer;
-    SequentialProcessor<TensorBuffer>? probabilityProcessor =
-        _probabilityProcessor;
+    SequentialProcessor<TensorBuffer>? probabilityProcessor = _probabilityProcessor;
     if (outputBuffer == null || probabilityProcessor == null) {
       return null;
     }
