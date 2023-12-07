@@ -111,7 +111,9 @@ class LivenessController extends FaceController {
             identityCondition,
           );
         } else {
-          livenessErrorResult.call([identityCondition]);
+          List<RecognitionCondition> allCondition = liveNess.allLivenessCondition();
+          allCondition.add(identityCondition);
+          livenessErrorResult.call(allCondition);
         }
       } else {
         livenessErrorResult.call(compareErrorsList);
