@@ -415,9 +415,11 @@ packages:
   tflite_flutter_helper:
     dependency: transitive
     description:
-      path: "/Users/gdrouin/Documents/development/tflite_flutter_helper"
-      relative: false
-    source: path
+      path: "."
+      ref: master
+      resolved-ref: "6a1882e7041a8557ec542f562b962c2d610ab69b"
+      url: "https://github.com/LeBzul/tflite_flutter_helper.git"
+    source: git
     version: "0.3.0"
   tuple:
     dependency: transitive

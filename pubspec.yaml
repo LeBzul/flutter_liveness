@@ -18,10 +18,9 @@ dependencies:
   tflite_flutter: ^0.10.0
   path_provider: ^2.0.9
   tflite_flutter_helper:
-    path: /Users/gdrouin/Documents/development/tflite_flutter_helper
-    #git:
-    #  url: https://github.com/LeBzul/tflite_flutter_helper.git
-    #  ref: master # branch name
+    git:
+     url: https://github.com/LeBzul/tflite_flutter_helper.git
+     ref: master # branch name
 
 dependency_overrides:
   google_mlkit_commons: ^0.5.0
