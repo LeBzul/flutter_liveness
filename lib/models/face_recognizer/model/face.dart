@@ -12,6 +12,7 @@ import 'face_recognition.dart';
 class FaceImage {
   final mlkit.Face face;
   final img.Image image;
+  final img.Image originalImage;
   bool _recognitionFailed = false;
   FaceRecognition? _faceRecognition;
   final FaceRecognizer _faceRecognizer;
@@ -19,6 +20,7 @@ class FaceImage {
   FaceImage({
     required this.face,
     required this.image,
+    required this.originalImage,
     required FaceRecognizer faceRecognizer,
   }) : _faceRecognizer = faceRecognizer;
 

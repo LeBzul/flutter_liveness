@@ -2,7 +2,6 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:liveness/controllers/face_controller.dart';
 import 'package:liveness/controllers/liveness_controller.dart';
-import 'package:liveness/models/condition/identity/identity_condition.dart';
 import 'package:liveness/models/condition/liveness/liveness_condition.dart';
 import 'package:liveness/models/condition/liveness/liveness_process.dart';
 import 'package:liveness/models/condition/recognition_condition.dart';
@@ -11,11 +10,9 @@ import 'package:liveness/models/face_recognizer/model/face_recognition.dart';
 class LivenessWidget extends StatefulWidget {
   final List<LivenessCondition> liveNessActiveConditions;
   final List<LivenessCondition> liveNessPassiveConditions;
-  final IdentityCondition identityCondition;
   final Function(
     LivenessProcess liveness,
     List<FaceRecognition> faceRecognitions,
-    IdentityCondition identityCondition,
   ) livenessSuccessResult;
   final Function(
     RecognitionCondition? actualCondition,
@@ -36,7 +33,6 @@ class LivenessWidget extends StatefulWidget {
     required this.liveNessPassiveConditions,
     required this.livenessSuccessResult,
     required this.livenessErrorResult,
-    required this.identityCondition,
     this.stepConditionChange,
     this.showInstructions = true,
     this.showPictureFrame = true,
@@ -63,11 +59,10 @@ class _LivenessWidgetState extends State<LivenessWidget> {
       },
       liveNessStepConditions: widget.liveNessActiveConditions,
       liveNessPassiveStepConditions: widget.liveNessPassiveConditions,
-      livenessSuccessResult: (liveness, faceRecognitions, identityCondition) {
+      livenessSuccessResult: (liveness, faceRecognitions) {
         widget.livenessSuccessResult.call(
           liveness,
           faceRecognitions,
-          identityCondition,
         );
         setState(() {});
       },
@@ -79,7 +74,6 @@ class _LivenessWidgetState extends State<LivenessWidget> {
         setState(() {});
       },
       stepConditionChange: widget.stepConditionChange,
-      identityCondition: widget.identityCondition,
     );
   }
 

@@ -9,11 +9,9 @@ class LivenessProcess {
 
   List<LivenessCondition> liveNessActiveConditions;
   List<LivenessCondition> liveNessPassiveConditions;
-  IdentityCondition identityCondition;
   LivenessProcess({
     required this.liveNessActiveConditions,
     required this.liveNessPassiveConditions,
-    required this.identityCondition,
   });
 
   bool get livenessIsCompleted {
@@ -42,11 +40,7 @@ class LivenessProcess {
     step = liveNessPassiveConditions.firstWhereOrNull(
       (element) => element.conditionResult.containsValue(null),
     );
-    if (step != null) {
-      return step;
-    }
-
-    return identityCondition;
+    return step;
   }
 
   int get maxStep {

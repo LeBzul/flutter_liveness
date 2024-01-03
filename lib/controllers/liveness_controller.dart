@@ -1,6 +1,5 @@
 import 'package:camera/camera.dart';
 import 'package:liveness/controllers/face_controller.dart';
-import 'package:liveness/models/condition/identity/identity_condition.dart';
 import 'package:liveness/models/condition/liveness/liveness_condition.dart';
 import 'package:liveness/models/condition/recognition_condition.dart';
 import 'package:liveness/models/condition/recognition_condition_result.dart';
@@ -18,7 +17,6 @@ class LivenessController extends FaceController {
   final Function(
     LivenessProcess liveness,
     List<FaceRecognition> faceRecognitions,
-    IdentityCondition identityCondition,
   ) livenessSuccessResult;
 
   final Function(
@@ -31,20 +29,16 @@ class LivenessController extends FaceController {
     List<RecognitionCondition> errorConditions,
   ) livenessErrorResult;
 
-  final IdentityCondition identityCondition;
-
   LivenessController({
     required super.stateChangeListener,
     required this.liveNessStepConditions,
     required this.liveNessPassiveStepConditions,
     required this.livenessSuccessResult,
     required this.livenessErrorResult,
-    required this.identityCondition,
     this.stepConditionChange,
   })  : liveNess = LivenessProcess(
           liveNessActiveConditions: liveNessStepConditions,
           liveNessPassiveConditions: liveNessPassiveStepConditions,
-          identityCondition: identityCondition,
         ),
         super(
           cameraError: () {
@@ -102,19 +96,10 @@ class LivenessController extends FaceController {
           }
         }
 
-        await identityCondition.checkIdentity(faceRecognizer);
-
-        if (identityCondition.isValidated) {
-          livenessSuccessResult.call(
-            liveNess,
-            await _getAllFaceRecognition(),
-            identityCondition,
-          );
-        } else {
-          List<RecognitionCondition> allCondition = liveNess.allLivenessCondition();
-          allCondition.add(identityCondition);
-          livenessErrorResult.call(allCondition);
-        }
+        livenessSuccessResult.call(
+          liveNess,
+          await _getAllFaceRecognition(),
+        );
       } else {
         livenessErrorResult.call(compareErrorsList);
       }
