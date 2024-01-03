@@ -106,7 +106,7 @@ class FaceController {
 
     cameraController = CameraController(
       cameraDescription,
-      ResolutionPreset.high,
+      ResolutionPreset.max,
       enableAudio: false,
     );
 
