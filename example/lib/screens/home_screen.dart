@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:liveness/controllers/face_controller.dart';
@@ -35,9 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.max,
             children: [
-              Center(
-                child: distanceSelector(),
-              ),
               const Padding(
                 padding: EdgeInsets.fromLTRB(50, 8, 25, 6),
                 child: Text(
@@ -116,49 +111,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget distanceSelector() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        IconButton(
-          splashColor: Colors.green,
-          onPressed: () {
-            FaceController.maxRecognitionDistance = max(
-              FaceController.maxRecognitionDistance - 0.05,
-              0,
-            );
-            setState(() {});
-          },
-          iconSize: 30,
-          icon: const Icon(
-            Icons.remove,
-            color: Colors.white,
-          ),
-        ),
-        Text(
-          'Distance : ${FaceController.maxRecognitionDistance.toStringAsFixed(2)}',
-          style: TextStyle(color: Colors.white),
-        ),
-        IconButton(
-          color: Colors.green,
-          iconSize: 30,
-          onPressed: () {
-            FaceController.maxRecognitionDistance = min(
-              FaceController.maxRecognitionDistance + 0.05,
-              1,
-            );
-            setState(() {});
-          },
-          icon: Icon(
-            Icons.add,
-            color: Colors.white,
-          ),
-        ),
-      ],
     );
   }
 }

@@ -36,7 +36,7 @@ class RecognizingController extends FaceController {
       return faceImage;
     }
 
-    if (recognition.distance < FaceController.maxRecognitionDistance) {
+    if (recognition.distance < maxRecognitionDistance) {
       recognizingFinish = true;
       successResult.call(recognition);
     }

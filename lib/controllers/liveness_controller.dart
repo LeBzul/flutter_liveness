@@ -147,7 +147,7 @@ class LivenessController extends FaceController {
           continue;
         }
 
-        if (faceRecognition.distance > FaceController.maxRecognitionDistance) {
+        if (faceRecognition.distance > maxRecognitionDistance) {
           conditionResultErrors.add(livenessCondition);
           continue;
         }
@@ -169,7 +169,7 @@ class LivenessController extends FaceController {
       }
       if (livenessCondition == liveNess.allLivenessCondition().first) {
         faceRecognizer.registered.add(faceRecognition);
-      } else if (faceRecognition.distance > FaceController.maxRecognitionDistance) {
+      } else if (faceRecognition.distance > maxRecognitionDistance) {
         /// Comme on ne peut pas determiner lequel est réelement en erreurs, on les mets tous en erreurs
         return liveNess.allLivenessCondition();
       }

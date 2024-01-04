@@ -26,7 +26,7 @@ enum ControllerState {
 
 class FaceController extends ChangeNotifier {
   static FaceNet selectedFaceNet = FaceNet.facenet;
-  static double maxRecognitionDistance = 0.65;
+  double maxRecognitionDistance = 0.65;
   bool cameraBusy = false;
 
   final Function() cameraError;
@@ -53,6 +53,7 @@ class FaceController extends ChangeNotifier {
   FaceController({
     required this.cameraError,
     required List<FaceRecognition> registeredFaces,
+    double maxRecognitionDistance = 0.65,
     CameraLensDirection cameraLensDirection = CameraLensDirection.front,
   }) {
     //Initialize mlkit face detector
