@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image/image.dart' as img;
@@ -23,18 +24,16 @@ enum ControllerState {
   refresh,
 }
 
-class FaceController {
+class FaceController extends ChangeNotifier {
   static FaceNet selectedFaceNet = FaceNet.facenet;
   static double maxRecognitionDistance = 0.65;
   bool cameraBusy = false;
-
-  Function(ControllerState state) stateChangeListener;
 
   final Function() cameraError;
   ControllerState _state = ControllerState.loading;
   set state(ControllerState value) {
     _state = value;
-    stateChangeListener.call(_state);
+    notifyListeners();
   }
 
   ControllerState get state => _state;
@@ -52,7 +51,6 @@ class FaceController {
   late FaceRecognizer faceRecognizer;
 
   FaceController({
-    required this.stateChangeListener,
     required this.cameraError,
     required List<FaceRecognition> registeredFaces,
     CameraLensDirection cameraLensDirection = CameraLensDirection.front,

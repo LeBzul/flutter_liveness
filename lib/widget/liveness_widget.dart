@@ -2,40 +2,13 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:liveness/controllers/face_controller.dart';
 import 'package:liveness/controllers/liveness_controller.dart';
-import 'package:liveness/models/condition/liveness/liveness_condition.dart';
-import 'package:liveness/models/condition/liveness/liveness_process.dart';
-import 'package:liveness/models/condition/recognition_condition.dart';
-import 'package:liveness/models/face_recognizer/model/face_recognition.dart';
 
 class LivenessWidget extends StatefulWidget {
-  final List<LivenessCondition> liveNessActiveConditions;
-  final List<LivenessCondition> liveNessPassiveConditions;
-  final Function(
-    LivenessProcess liveness,
-    List<FaceRecognition> faceRecognitions,
-  ) livenessSuccessResult;
-  final Function(
-    RecognitionCondition? actualCondition,
-    int stepCount,
-    int maxStep,
-  )? stepConditionChange;
-  final Function(
-    LivenessProcess liveness,
-    List<RecognitionCondition> errorConditions,
-  ) livenessErrorResult;
-
-  final bool showInstructions;
-  final bool showPictureFrame;
+  final LivenessController livenessController;
 
   const LivenessWidget({
     Key? key,
-    required this.liveNessActiveConditions,
-    required this.liveNessPassiveConditions,
-    required this.livenessSuccessResult,
-    required this.livenessErrorResult,
-    this.stepConditionChange,
-    this.showInstructions = true,
-    this.showPictureFrame = true,
+    required this.livenessController,
   }) : super(key: key);
 
   @override
@@ -43,38 +16,12 @@ class LivenessWidget extends StatefulWidget {
 }
 
 class _LivenessWidgetState extends State<LivenessWidget> {
-  late LivenessController _controller;
-
   @override
   void initState() {
     super.initState();
-
-    _controller = LivenessController(
-      stateChangeListener: (ControllerState state) {
-        if (!mounted) {
-          return;
-        }
-
-        setState(() {});
-      },
-      liveNessStepConditions: widget.liveNessActiveConditions,
-      liveNessPassiveStepConditions: widget.liveNessPassiveConditions,
-      livenessSuccessResult: (liveness, faceRecognitions) {
-        widget.livenessSuccessResult.call(
-          liveness,
-          faceRecognitions,
-        );
-        setState(() {});
-      },
-      livenessErrorResult: (errorConditions) {
-        widget.livenessErrorResult.call(
-          _controller.liveNess,
-          errorConditions,
-        );
-        setState(() {});
-      },
-      stepConditionChange: widget.stepConditionChange,
-    );
+    widget.livenessController.addListener(() {
+      setState(() {});
+    });
   }
 
   @override
@@ -83,7 +30,7 @@ class _LivenessWidgetState extends State<LivenessWidget> {
   }
 
   Widget buildBody() {
-    switch (_controller.state) {
+    switch (widget.livenessController.state) {
       case ControllerState.loading:
         return buildLoading();
       case ControllerState.refresh:
@@ -104,7 +51,7 @@ class _LivenessWidgetState extends State<LivenessWidget> {
   }
 
   Widget buildCameraWidget() {
-    CameraController? controller = _controller.cameraController;
+    CameraController? controller = widget.livenessController.cameraController;
     if (controller == null || !controller.value.isInitialized) {
       return buildLoading();
     }
@@ -116,21 +63,21 @@ class _LivenessWidgetState extends State<LivenessWidget> {
           aspectRatio: controller.value.aspectRatio,
           child: CameraPreview(controller),
         ),
-        widget.showPictureFrame
+        widget.livenessController.showPictureFrame
             ? LayoutBuilder(
                 builder: (context, constraints) {
                   return CustomPaint(
                     painter: _LivenessPictureFramePainter(
                       Size(
                         constraints.maxWidth,
-                        constraints.maxHeight - (widget.showInstructions ? 100 : 0),
+                        constraints.maxHeight - (widget.livenessController.showInstructions ? 100 : 0),
                       ),
                     ),
                   );
                 },
               )
             : Container(),
-        widget.showInstructions ? buildOverlay() : Container(),
+        widget.livenessController.showInstructions ? buildOverlay() : Container(),
       ],
     );
   }
@@ -144,7 +91,7 @@ class _LivenessWidgetState extends State<LivenessWidget> {
         color: Colors.white.withAlpha(100),
         height: 100,
         child: Center(
-          child: Text(_controller.liveNess.actualStep?.instruction ?? ""),
+          child: Text(widget.livenessController.liveNess.actualStep?.instruction ?? ""),
         ),
       ),
     );
@@ -152,7 +99,7 @@ class _LivenessWidgetState extends State<LivenessWidget> {
 
   @override
   void dispose() {
-    _controller.dispose();
+    widget.livenessController.dispose();
     super.dispose();
   }
 }

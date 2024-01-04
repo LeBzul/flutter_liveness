@@ -38,12 +38,6 @@ class _RecognizingWidgetState extends State<RecognizingWidget> {
     }
 
     _controller = RecognizingController(
-      stateChangeListener: (ControllerState state) {
-        if (!mounted) {
-          return;
-        }
-        setState(() {});
-      },
       cameraError: () {
         widget.errorResult.call();
       },

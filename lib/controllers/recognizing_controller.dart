@@ -10,7 +10,6 @@ class RecognizingController extends FaceController {
   ) successResult;
 
   RecognizingController({
-    required super.stateChangeListener,
     required this.successResult,
     required super.cameraError,
     required List<FaceRecognition> registeredFaces,

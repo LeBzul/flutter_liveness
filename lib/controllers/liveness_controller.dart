@@ -26,15 +26,20 @@ class LivenessController extends FaceController {
   )? stepConditionChange;
 
   final Function(
+    LivenessController controller,
     List<RecognitionCondition> errorConditions,
   ) livenessErrorResult;
 
+  final bool showInstructions;
+  final bool showPictureFrame;
+
   LivenessController({
-    required super.stateChangeListener,
     required this.liveNessStepConditions,
     required this.liveNessPassiveStepConditions,
     required this.livenessSuccessResult,
     required this.livenessErrorResult,
+    this.showInstructions = true,
+    this.showPictureFrame = true,
     this.stepConditionChange,
   })  : liveNess = LivenessProcess(
           liveNessActiveConditions: liveNessStepConditions,
@@ -42,7 +47,8 @@ class LivenessController extends FaceController {
         ),
         super(
           cameraError: () {
-            livenessErrorResult([]);
+            // TODO: renvoyer une erreur
+            // livenessErrorResult(this, []);
           },
           registeredFaces: [],
         );
@@ -101,7 +107,10 @@ class LivenessController extends FaceController {
           await _getAllFaceRecognition(),
         );
       } else {
-        livenessErrorResult.call(compareErrorsList);
+        livenessErrorResult.call(
+          this,
+          compareErrorsList,
+        );
       }
     }
     state = ControllerState.refresh;
@@ -182,5 +191,15 @@ class LivenessController extends FaceController {
       }
     }
     return faceRecognitionList;
+  }
+
+  void reset() {
+    faceRecognizer.registered.clear();
+    liveNess.reset();
+    stepConditionChange?.call(
+      liveNess.actualStep,
+      liveNess.stepCount,
+      liveNess.maxStep,
+    );
   }
 }

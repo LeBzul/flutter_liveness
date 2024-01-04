@@ -1,12 +1,10 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image/image.dart' as img;
-import 'package:path_provider/path_provider.dart';
 
 class ImageHelper {
   static Future<img.Image?> convertImage(CameraImage image) async {
@@ -72,24 +70,6 @@ class ImageHelper {
 
   static img.Image? base64ToImage(String base64) {
     return img.decodeImage(Uint8List.fromList(base64Decode(base64)));
-  }
-
-  /// Convert CameraImage from MlKit Image
-  static Future<InputImage?> getInputImageFromBase64(
-    String base64,
-  ) async {
-    final baseImage = base64ToImage(base64);
-
-    if (baseImage == null) {
-      return null;
-    }
-
-    var tempDir = await getTemporaryDirectory();
-    String fullPath = "${tempDir.path}/identity.jpg";
-
-    final img.Image orientedImage = img.bakeOrientation(baseImage);
-    final inputImage = InputImage.fromFile(await File(fullPath).writeAsBytes(img.encodeJpg(orientedImage)));
-    return inputImage;
   }
 
   static Future<List<Face>> detectFaceFromInputImage(
