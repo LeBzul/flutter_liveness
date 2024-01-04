@@ -40,7 +40,7 @@ class _LivenessScreenState extends State<LivenessScreen> {
                 controller.reset();
               },
               stepConditionChange: (controller, actualCondition, stepCount, maxStep) {},
-              cameraError: {},
+              cameraError: () {},
             ),
           ),
         ),
