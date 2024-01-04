@@ -38,6 +38,7 @@ class LivenessController extends FaceController {
     required this.liveNessPassiveStepConditions,
     required this.livenessSuccessResult,
     required this.livenessErrorResult,
+    required cameraError,
     this.showInstructions = true,
     this.showPictureFrame = true,
     this.stepConditionChange,
@@ -46,10 +47,7 @@ class LivenessController extends FaceController {
           liveNessPassiveConditions: liveNessPassiveStepConditions,
         ),
         super(
-          cameraError: () {
-            // TODO: renvoyer une erreur
-            // livenessErrorResult(this, []);
-          },
+          cameraError: cameraError,
           registeredFaces: [],
         );
 
