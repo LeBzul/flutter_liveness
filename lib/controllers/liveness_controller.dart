@@ -15,11 +15,12 @@ class LivenessController extends FaceController {
   List<LivenessCondition> liveNessPassiveStepConditions;
 
   final Function(
-    LivenessProcess liveness,
+    LivenessController controller,
     List<FaceRecognition> faceRecognitions,
   ) livenessSuccessResult;
 
   final Function(
+    LivenessController controller,
     RecognitionCondition? actualCondition,
     int stepCount,
     int maxStep,
@@ -57,6 +58,7 @@ class LivenessController extends FaceController {
   void refreshCamera() async {
     super.refreshCamera();
     stepConditionChange?.call(
+      this,
       liveNess.actualStep,
       liveNess.stepCount,
       liveNess.maxStep,
@@ -82,6 +84,7 @@ class LivenessController extends FaceController {
     );
     if (lastCondition != liveNess.actualStep) {
       stepConditionChange?.call(
+        this,
         liveNess.actualStep,
         liveNess.stepCount,
         liveNess.maxStep,
@@ -103,7 +106,7 @@ class LivenessController extends FaceController {
         }
 
         livenessSuccessResult.call(
-          liveNess,
+          this,
           await _getAllFaceRecognition(),
         );
       } else {
@@ -197,6 +200,7 @@ class LivenessController extends FaceController {
     faceRecognizer.registered.clear();
     liveNess.reset();
     stepConditionChange?.call(
+      this,
       liveNess.actualStep,
       liveNess.stepCount,
       liveNess.maxStep,

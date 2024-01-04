@@ -22,26 +22,27 @@ class _LivenessScreenState extends State<LivenessScreen> {
     return SafeArea(
       child: Scaffold(
         body: SizedBox(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            child: LivenessWidget(
-              livenessController: LivenessController(
-                liveNessStepConditions: [],
-                liveNessPassiveStepConditions: [
-                  LivenessCenterFace(instruction: "Mettez votre tête bien droite en face de l'ecran."),
-                  LiveNessTurnLeftFace(),
-                  LivenessTurnRightFace(),
-                  LivenessEyeBlink(),
-                ],
-                livenessSuccessResult: (liveness, faceRecognitions) {
-                  Navigator.pop(context);
-                },
-                livenessErrorResult: (controller, errorConditions) {
-                  controller.reset();
-                },
-                stepConditionChange: (actualCondition, stepCount, maxStep) {},
-              ),
-            )),
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          child: LivenessWidget(
+            livenessController: LivenessController(
+              liveNessStepConditions: [],
+              liveNessPassiveStepConditions: [
+                LivenessCenterFace(instruction: "Mettez votre tête bien droite en face de l'ecran."),
+                LiveNessTurnLeftFace(),
+                LivenessTurnRightFace(),
+                LivenessEyeBlink(),
+              ],
+              livenessSuccessResult: (controller, faceRecognitions) {
+                Navigator.pop(context);
+              },
+              livenessErrorResult: (controller, errorConditions) {
+                controller.reset();
+              },
+              stepConditionChange: (controller, actualCondition, stepCount, maxStep) {},
+            ),
+          ),
+        ),
       ),
     );
   }
