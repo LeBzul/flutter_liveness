@@ -2,75 +2,47 @@ import 'package:flutter/material.dart';
 import 'package:liveness/models/condition/liveness/liveness_condition.dart';
 
 class LivenessEyeBlink extends LivenessCondition {
-  static const double _maxRangeCenterFace = 10;
-
   LivenessEyeBlink({
     String instruction = "Cligner des yeux lentement",
   }) : super(
-          name: 'EyeBlink',
           rangesConditionsList: [
-            _centerFaceCondition()
-              ..add(
-                LivenessRangeCondition(
-                  range: const RangeValues(0, 0.05),
+            [
+              LivenessRangeCondition(
+                range: RangeCondition(
+                  value: const RangeValues(0, 0.2),
                   optimalValue: 0,
-                  analyseFaceValue: FaceMap.leftEyeOpenProbability,
                 ),
+                analyseFaceValue: FaceMap.leftEye,
               ),
-            _centerFaceCondition()
-              ..add(
-                LivenessRangeCondition(
-                  range: const RangeValues(0.8, 1),
+            ],
+            [
+              LivenessRangeCondition(
+                range: RangeCondition(
+                  value: const RangeValues(0.8, 1),
                   optimalValue: 1,
-                  analyseFaceValue: FaceMap.leftEyeOpenProbability,
                 ),
+                analyseFaceValue: FaceMap.leftEye,
               ),
-            _centerFaceCondition()
-              ..add(
-                LivenessRangeCondition(
-                  range: const RangeValues(0, 0.05),
+            ],
+            [
+              LivenessRangeCondition(
+                range: RangeCondition(
+                  value: const RangeValues(0, 0.2),
                   optimalValue: 0,
-                  analyseFaceValue: FaceMap.rightEyeOpenProbability,
                 ),
+                analyseFaceValue: FaceMap.rightEye,
               ),
-            _centerFaceCondition()
-              ..add(
-                LivenessRangeCondition(
-                  range: const RangeValues(0.8, 1),
+            ],
+            [
+              LivenessRangeCondition(
+                range: RangeCondition(
+                  value: const RangeValues(0.8, 1),
                   optimalValue: 1,
-                  analyseFaceValue: FaceMap.rightEyeOpenProbability,
                 ),
+                analyseFaceValue: FaceMap.rightEye,
               ),
+            ]
           ],
           instruction: instruction,
         );
-
-  static List<LivenessRangeCondition> _centerFaceCondition() {
-    return [
-      LivenessRangeCondition(
-        range: const RangeValues(
-          -_maxRangeCenterFace,
-          _maxRangeCenterFace,
-        ),
-        optimalValue: 0,
-        analyseFaceValue: FaceMap.headEulerAngleX,
-      ),
-      LivenessRangeCondition(
-        range: const RangeValues(
-          -_maxRangeCenterFace,
-          _maxRangeCenterFace,
-        ),
-        optimalValue: 0,
-        analyseFaceValue: FaceMap.headEulerAngleY,
-      ),
-      LivenessRangeCondition(
-        range: const RangeValues(
-          -_maxRangeCenterFace,
-          _maxRangeCenterFace,
-        ),
-        optimalValue: 0,
-        analyseFaceValue: FaceMap.headEulerAngleZ,
-      )
-    ];
-  }
 }

@@ -6,7 +6,6 @@ class LiveNessTurnLeftFace extends LivenessCondition {
   LiveNessTurnLeftFace({
     String instruction = "Tourner la tête lentement vers la gauche",
   }) : super(
-          name: 'TurnLeft',
           rangesConditionsList: LiveNessTurnFace.directionConditions(
             LiveNessTurnFaceDirection.left,
           ),

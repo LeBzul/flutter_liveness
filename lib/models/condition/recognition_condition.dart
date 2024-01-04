@@ -1,10 +1,10 @@
-import 'recognition_condition_result.dart';
+import 'liveness_condition_result.dart';
 
 abstract class RecognitionCondition {
   String instruction;
   String name;
 
-  Map<int, RecognitionConditionResult?> conditionResult = <int, RecognitionConditionResult?>{};
+  Map<int, LivenessConditionResult?> conditionResult = <int, LivenessConditionResult?>{};
 
   RecognitionCondition({
     required this.name,
@@ -16,7 +16,7 @@ abstract class RecognitionCondition {
   bool get isValidated => !conditionResult.containsValue(null);
 
   void initConditionResult() {
-    conditionResult = <int, RecognitionConditionResult?>{};
+    conditionResult = <int, LivenessConditionResult?>{};
   }
 
   void reset() {

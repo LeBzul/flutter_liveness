@@ -1,41 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:liveness/models/condition/liveness/liveness_condition.dart';
 
-import 'liveness_turn_face.dart';
-
-class LivenessCenterFace extends LivenessCondition with LiveNessTurnFace {
+class LivenessCenterFace extends LivenessCondition {
   double maxRange;
 
   LivenessCenterFace({
     this.maxRange = 5,
     String instruction = "Mettez votre tête bien droite",
   }) : super(
-          name: 'CenterFace',
           rangesConditionsList: [
             [
               LivenessRangeCondition(
-                range: RangeValues(
-                  -maxRange,
-                  maxRange,
+                range: RangeCondition(
+                  value: RangeValues(
+                    -maxRange,
+                    maxRange,
+                  ),
+                  optimalValue: 0,
                 ),
-                optimalValue: 0,
-                analyseFaceValue: FaceMap.headEulerAngleX,
+                analyseFaceValue: FaceMap.faceAngleX,
               ),
               LivenessRangeCondition(
-                range: RangeValues(
-                  -maxRange,
-                  maxRange,
+                range: RangeCondition(
+                  value: RangeValues(
+                    -maxRange,
+                    maxRange,
+                  ),
+                  optimalValue: 0,
                 ),
-                optimalValue: 0,
-                analyseFaceValue: FaceMap.headEulerAngleY,
+                analyseFaceValue: FaceMap.faceAngleY,
               ),
               LivenessRangeCondition(
-                range: RangeValues(
-                  -maxRange,
-                  maxRange,
+                range: RangeCondition(
+                  value: RangeValues(
+                    -maxRange,
+                    maxRange,
+                  ),
+                  optimalValue: 0,
                 ),
-                optimalValue: 0,
-                analyseFaceValue: FaceMap.headEulerAngleZ,
+                analyseFaceValue: FaceMap.faceAngleZ,
               ),
             ],
           ],

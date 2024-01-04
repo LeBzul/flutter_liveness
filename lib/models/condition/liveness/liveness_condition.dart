@@ -1,22 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
-import 'package:liveness/models/condition/recognition_condition.dart';
-import 'package:liveness/models/condition/recognition_condition_result.dart';
+import 'package:liveness/models/condition/liveness_condition_result.dart';
 import 'package:liveness/models/face_recognizer/model/face.dart';
 
-abstract class LivenessCondition extends RecognitionCondition {
+abstract class LivenessCondition {
+  String instruction;
+
   List<List<LivenessRangeCondition>> rangesConditionsList;
+  Map<int, LivenessConditionResult?> conditionResult = <int, LivenessConditionResult?>{};
+  bool get isValidated => !conditionResult.containsValue(null);
 
   LivenessCondition({
     required this.rangesConditionsList,
-    required super.name,
-    required super.instruction,
-  });
+    required this.instruction,
+  }) {
+    initConditionResult();
+  }
 
-  @override
+  void reset() {
+    initConditionResult();
+  }
+
   void initConditionResult() {
     int i = 0;
-    conditionResult = <int, RecognitionConditionResult?>{};
+    conditionResult = <int, LivenessConditionResult?>{};
     for (var _ in rangesConditionsList) {
       conditionResult.putIfAbsent(i++, () => null);
     }
@@ -26,30 +33,29 @@ abstract class LivenessCondition extends RecognitionCondition {
     FaceImage faceImage,
   ) {
     int indexRangesConditions = 0;
-    for (var rangesList in rangesConditionsList) {
+    for (var rangesConditionList in rangesConditionsList) {
       List<double> probability = [];
 
       int indexRange = 0;
-      for (var range in rangesList) {
+      for (var rangeCondition in rangesConditionList) {
         double? value = FaceMap.getValue(
-          range.analyseFaceValue,
+          rangeCondition.analyseFaceValue,
           faceImage.face,
         );
-        if (value != null && value < range.range.end && value > range.range.start) {
-          RecognitionConditionResult? lastConditionResult =
+        if (value != null && value < rangeCondition.range.value.end && value > rangeCondition.range.value.start) {
+          LivenessConditionResult? lastConditionResult =
               conditionResult.containsKey(indexRangesConditions) ? conditionResult[indexRangesConditions] : null;
           if (lastConditionResult == null ||
-              range.optimalValue.abs() - lastConditionResult.value[indexRange].abs() >
-                  range.optimalValue.abs() - value.abs()) {
+              rangeCondition.range.optimalValue.abs() - lastConditionResult.value[indexRange].abs() >
+                  rangeCondition.range.optimalValue.abs() - value.abs()) {
             probability.add(value);
           }
         }
         indexRange++;
       }
 
-      if (probability.length == rangesList.length) {
-        conditionResult[indexRangesConditions] = RecognitionConditionResult(
-          name: name,
+      if (probability.length == rangesConditionList.length) {
+        conditionResult[indexRangesConditions] = LivenessConditionResult(
           value: probability,
           faceImage: faceImage,
         );
@@ -78,7 +84,6 @@ abstract class LivenessCondition extends RecognitionCondition {
     });
 
     return <String, dynamic>{
-      'name': name,
       'instruction': instruction,
       'rangesConditions': rangesConditionsMap,
       'conditionResult': conditionResultMap,
@@ -86,44 +91,53 @@ abstract class LivenessCondition extends RecognitionCondition {
   }
 }
 
-class LivenessRangeCondition {
-  RangeValues range;
+class RangeCondition {
+  RangeValues value;
   double optimalValue;
+
+  RangeCondition({
+    required this.value,
+    required this.optimalValue,
+  });
+}
+
+class LivenessRangeCondition {
+  RangeCondition range;
   FaceMap analyseFaceValue;
   LivenessRangeCondition({
     required this.range,
-    required this.optimalValue,
     required this.analyseFaceValue,
   });
 
   Map<String, dynamic> toJson() => {
         'analyseFaceValue': analyseFaceValue.name,
-        'optimalValue': optimalValue,
         'range': <String, dynamic>{
-          'start': range.start,
-          'end': range.end,
+          'start': range.value.start,
+          'end': range.value.end,
         },
       };
 }
 
 enum FaceMap {
-  leftEyeOpenProbability,
-  rightEyeOpenProbability,
-  headEulerAngleX,
-  headEulerAngleY,
-  headEulerAngleZ;
+  leftEye,
+  rightEye,
+  faceAngleX,
+  faceAngleY,
+  faceAngleZ;
 
   static double? getValue(FaceMap faceMap, Face face) {
+    // MlKit doc :
+    // https://developers.google.com/ml-kit/reference/swift/mlkitfacedetection/api/reference/Classes/Face?hl=fr
     switch (faceMap) {
-      case FaceMap.leftEyeOpenProbability:
+      case FaceMap.leftEye:
         return face.leftEyeOpenProbability;
-      case FaceMap.rightEyeOpenProbability:
+      case FaceMap.rightEye:
         return face.rightEyeOpenProbability;
-      case FaceMap.headEulerAngleX:
+      case FaceMap.faceAngleX:
         return face.headEulerAngleX;
-      case FaceMap.headEulerAngleY:
+      case FaceMap.faceAngleY:
         return face.headEulerAngleY;
-      case FaceMap.headEulerAngleZ:
+      case FaceMap.faceAngleZ:
         return face.headEulerAngleZ;
     }
   }

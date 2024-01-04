@@ -28,7 +28,7 @@ class LivenessProcess {
     return true;
   }
 
-  RecognitionCondition? get actualStep {
+  LivenessCondition? get actualStep {
     LivenessCondition? step = liveNessActiveConditions.firstWhereOrNull(
       (element) => element.conditionResult.containsValue(null),
     );
@@ -68,7 +68,7 @@ class LivenessProcess {
     return maxStep;
   }
 
-  void reset({List<RecognitionConditionResult>? conditionReset}) {
+  void reset({List<LivenessConditionResult>? conditionReset}) {
     _resetCondition(
       conditions: liveNessActiveConditions,
       conditionsReset: conditionReset,
@@ -81,7 +81,7 @@ class LivenessProcess {
 
   void _resetCondition({
     required List<LivenessCondition> conditions,
-    List<RecognitionConditionResult>? conditionsReset,
+    List<LivenessConditionResult>? conditionsReset,
   }) {
     for (var condition in conditions) {
       if (conditionsReset == null) {
@@ -99,7 +99,7 @@ class LivenessProcess {
   void updateFaceLiveNess(
     FaceImage faceImage,
   ) {
-    RecognitionCondition? actualStep = this.actualStep;
+    LivenessCondition? actualStep = this.actualStep;
     if (actualStep is LivenessCondition) {
       actualStep.updateFace(faceImage);
       for (var element in liveNessPassiveConditions) {
@@ -119,11 +119,11 @@ class LivenessProcess {
     return conditionsList;
   }
 
-  List<List<RecognitionConditionResult>> livenessConditionResults() {
-    List<List<RecognitionConditionResult>> conditionsList = [];
+  List<List<LivenessConditionResult>> livenessConditionResults() {
+    List<List<LivenessConditionResult>> conditionsList = [];
     for (var element in liveNessActiveConditions) {
-      List<RecognitionConditionResult> tempList = [];
-      List<RecognitionConditionResult?> results = element.conditionResult.values.toList();
+      List<LivenessConditionResult> tempList = [];
+      List<LivenessConditionResult?> results = element.conditionResult.values.toList();
       for (var result in results) {
         if (result != null) {
           tempList.add(result);
@@ -133,8 +133,8 @@ class LivenessProcess {
     }
 
     for (var element in liveNessPassiveConditions) {
-      List<RecognitionConditionResult> tempList = [];
-      List<RecognitionConditionResult?> results = element.conditionResult.values.toList();
+      List<LivenessConditionResult> tempList = [];
+      List<LivenessConditionResult?> results = element.conditionResult.values.toList();
       for (var result in results) {
         if (result != null) {
           tempList.add(result);
@@ -143,22 +143,5 @@ class LivenessProcess {
       conditionsList.add(tempList);
     }
     return conditionsList;
-  }
-
-  Map<String, dynamic> toJson() {
-    Map<String, dynamic> liveNessActiveConditionsMap = <String, dynamic>{};
-    for (var element in liveNessActiveConditions) {
-      liveNessActiveConditionsMap.putIfAbsent(element.name, () => element.toJson());
-    }
-
-    Map<String, dynamic> liveNessPassiveConditionsMap = <String, dynamic>{};
-    for (var element in liveNessPassiveConditions) {
-      liveNessPassiveConditionsMap.putIfAbsent(element.name, () => element.toJson());
-    }
-
-    return <String, dynamic>{
-      "liveNessActiveConditions": liveNessActiveConditionsMap,
-      "liveNessPassiveConditions": liveNessPassiveConditionsMap,
-    };
   }
 }
