@@ -1,4 +1,5 @@
 export "controllers/liveness_controller.dart";
+export 'models/face_recognizer/model/face_recognition.dart';
 export 'models/liveness/condition/eyes/liveness_eye_blink.dart';
 export 'models/liveness/condition/liveness_condition.dart';
 export 'models/liveness/condition/liveness_condition_result.dart';
