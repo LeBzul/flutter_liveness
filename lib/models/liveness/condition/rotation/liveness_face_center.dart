@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:liveness/models/condition/liveness/liveness_condition.dart';
+import 'package:liveness/models/liveness/condition/liveness_condition.dart';
 
-class LivenessCenterFace extends LivenessCondition {
+class LivenessFaceCenter extends LivenessCondition {
   double maxRange;
 
-  LivenessCenterFace({
+  LivenessFaceCenter({
     this.maxRange = 5,
     String instruction = "Mettez votre tête bien droite",
   }) : super(

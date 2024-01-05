@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
-import 'package:liveness/models/condition/liveness_condition_result.dart';
 import 'package:liveness/models/face_recognizer/model/face.dart';
+import 'package:liveness/models/liveness/condition/liveness_condition_result.dart';
 
 abstract class LivenessCondition {
   String instruction;

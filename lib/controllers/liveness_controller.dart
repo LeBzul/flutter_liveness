@@ -1,11 +1,10 @@
 import 'package:camera/camera.dart';
 import 'package:liveness/controllers/face_controller.dart';
-import 'package:liveness/models/condition/liveness/liveness_condition.dart';
-import 'package:liveness/models/condition/liveness_condition_result.dart';
 import 'package:liveness/models/face_recognizer/model/face.dart';
 import 'package:liveness/models/face_recognizer/model/face_recognition.dart';
-
-import '../models/condition/liveness/liveness_process.dart';
+import 'package:liveness/models/liveness/condition/liveness_condition.dart';
+import 'package:liveness/models/liveness/condition/liveness_condition_result.dart';
+import 'package:liveness/models/liveness/liveness_process.dart';
 
 class LivenessController extends FaceController {
   LivenessProcess liveNess;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:liveness/controllers/liveness_controller.dart';
 import 'package:liveness/liveness.dart';
+import 'package:liveness/models/liveness/condition/liveness_condition.dart';
 
 class LivenessScreen extends StatefulWidget {
   const LivenessScreen({Key? key}) : super(key: key);
@@ -10,7 +10,7 @@ class LivenessScreen extends StatefulWidget {
 }
 
 class _LivenessScreenState extends State<LivenessScreen> {
-  RecognitionCondition? actualStep;
+  LivenessCondition? actualStep;
 
   @override
   void initState() {
@@ -28,9 +28,9 @@ class _LivenessScreenState extends State<LivenessScreen> {
             livenessController: LivenessController(
               liveNessStepConditions: [],
               liveNessPassiveStepConditions: [
-                LivenessCenterFace(instruction: "Mettez votre tête bien droite en face de l'ecran."),
-                LiveNessTurnLeftFace(),
-                LivenessTurnRightFace(),
+                LivenessFaceCenter(instruction: "Mettez votre tête bien droite en face de l'ecran."),
+                LivenessFaceTurnLeft(),
+                LivenessFaceTurnRight(),
                 LivenessEyeBlink(),
               ],
               livenessSuccessResult: (controller, faceRecognitions) {

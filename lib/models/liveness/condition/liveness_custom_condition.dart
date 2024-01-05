@@ -1,4 +1,4 @@
-import 'package:liveness/models/condition/liveness/liveness_condition.dart';
+import 'liveness_condition.dart';
 
 class LivenessCustomCondition extends LivenessCondition {
   LivenessCustomCondition({

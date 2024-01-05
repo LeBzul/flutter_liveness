@@ -1,8 +1,8 @@
 import 'package:liveness/helper/list_helper.dart';
-import 'package:liveness/liveness.dart';
 import 'package:liveness/models/face_recognizer/model/face.dart';
+import 'package:liveness/models/liveness/condition/liveness_condition_result.dart';
 
-import 'liveness_condition.dart';
+import 'condition/liveness_condition.dart';
 
 class LivenessProcess {
   int? faceId;
