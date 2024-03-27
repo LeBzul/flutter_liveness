@@ -18,11 +18,11 @@ mixin LivenessFaceTurn {
         LivenessRangeCondition(
           range: RangeCondition(
             value: direction == LivenessFaceDirectionTurn.left
-                ? (Platform.isAndroid ? const RangeValues(5, 30) : const RangeValues(-30, 5))
-                : (Platform.isAndroid ? const RangeValues(-30, -5) : const RangeValues(5, 30)),
+                ? (Platform.isAndroid ? const RangeValues(5, 15) : const RangeValues(-15, -5))
+                : (Platform.isAndroid ? const RangeValues(-15, -5) : const RangeValues(5, 15)),
             optimalValue: direction == LivenessFaceDirectionTurn.left
-                ? (Platform.isAndroid ? 20 : -20)
-                : (Platform.isAndroid ? -20 : 20),
+                ? (Platform.isAndroid ? 15 : -15)
+                : (Platform.isAndroid ? -15 : 15),
           ),
           analyseFaceValue: FaceMap.faceAngleY,
         ),
@@ -31,11 +31,11 @@ mixin LivenessFaceTurn {
         LivenessRangeCondition(
           range: RangeCondition(
             value: direction == LivenessFaceDirectionTurn.left
-                ? (Platform.isAndroid ? const RangeValues(25, 60) : const RangeValues(-60, -25))
-                : (Platform.isAndroid ? const RangeValues(-60, -25) : const RangeValues(25, 60)),
+                ? (Platform.isAndroid ? const RangeValues(16, 30) : const RangeValues(-30, -16))
+                : (Platform.isAndroid ? const RangeValues(-30, -16) : const RangeValues(16, 30)),
             optimalValue: direction == LivenessFaceDirectionTurn.left
-                ? (Platform.isAndroid ? 40 : -40)
-                : (Platform.isAndroid ? -40 : 40),
+                ? (Platform.isAndroid ? 30 : -30)
+                : (Platform.isAndroid ? -30 : 30),
           ),
           analyseFaceValue: FaceMap.faceAngleY,
         ),

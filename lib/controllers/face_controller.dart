@@ -105,7 +105,7 @@ class FaceController extends ChangeNotifier {
 
     cameraController = CameraController(
       cameraDescription,
-      ResolutionPreset.max,
+      ResolutionPreset.high,
       enableAudio: false,
     );
 
